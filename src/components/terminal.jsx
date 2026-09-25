@@ -20,8 +20,8 @@ export default function Terminal({ systemIntegrity = 100 }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!input.trim() || isTyping) return;
-
+    if (!input.trim() || isTyping) return
+;
     const userText = input;
     setInput('');
     

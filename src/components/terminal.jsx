@@ -59,7 +59,7 @@ export default function Terminal({ systemIntegrity = 100 }) {
   return (
     <div className="min-h-screen bg-black text-red-500 font-mono p-8 flex flex-col items-center justify-center selection:bg-red-900">
       
-      {/* The Pulsing HAL 9000 Eye */}
+      {/* The Pulsing HAL 9000 Eyed */}
       <div className="w-32 h-32 rounded-full border-4 border-red-900 mb-8 flex items-center justify-center shadow-[0_0_50px_rgba(255,0,0,0.6)] animate-pulse">
         <div className="w-16 h-16 rounded-full bg-yellow-500 shadow-[0_0_20px_rgba(255,255,0,1)]"></div>
       </div>

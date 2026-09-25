@@ -57,6 +57,16 @@ function Home() {
         <p>
           Open{' '}
           <Link
+            to="/repair"
+            className="text-blue-600 underline hover:no-underline"
+          >
+            generator repair puzzle
+          </Link>{' '}
+          to play the 8×8 repair puzzle.
+        </p>
+        <p>
+          Open{' '}
+          <Link
             to="/anotherPage"
             className="text-blue-600 underline hover:no-underline"
           >

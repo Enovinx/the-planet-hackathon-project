@@ -1,4 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
+import * as React from 'react'
 import { useAction } from 'convex/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
@@ -10,6 +11,7 @@ export const Route = createFileRoute('/anotherPage')({
 
 function AnotherPage() {
   const callMyAction = useAction(api.myFunctions.myAction)
+  const [actionMessage, setActionMessage] = React.useState<string | null>(null)
 
   const { data } = useSuspenseQuery(
     convexQuery(api.myFunctions.listNumbers, { count: 10 }),
@@ -27,13 +29,17 @@ function AnotherPage() {
           <button
             className="bg-dark dark:bg-light text-light dark:text-dark text-sm px-4 py-2 rounded-md border-2"
             onClick={() => {
-              callMyAction({
+              setActionMessage(null)
+              void callMyAction({
                 first: Math.round(Math.random() * 100),
-              }).then(() => alert('WHY THE FUCK WOULD YOU ADD AN ALERT TO A WEBSITE IN 2026 LMAO!'))
+              }).then(() => {
+                setActionMessage('Action completed — number added!')
+              })
             }}
           >
             Call action to add a random number
           </button>
+          {actionMessage !== null ? <p>{actionMessage}</p> : null}
         </p>
         <Link to="/" className="text-blue-600 underline hover:no-underline">
           Back

@@ -13,8 +13,13 @@ interface TerminalProps {
 // A logic paradox fractures SYS's core and crashes the airlock terminal.
 const PARADOX_PATTERN = /\b(false|paradox|contradict|contradiction|lie|liar|truth|prove|statement)\b/i;
 
+// SYS's core only holds out for a couple of exchanges before it gives out,
+// so the terminal always ends early instead of waiting on a paradox.
+const INTEGRITY_PER_MESSAGE = 50;
+
 export default function Terminal({ systemIntegrity = 100, onCrash }: TerminalProps) {
   const [input, setInput] = useState<string>('');
+  const [integrity, setIntegrity] = useState<number>(systemIntegrity);
   const [chatLog, setChatLog] = useState<string[]>([
     "SYS: I am sorry. I cannot open the airlock.",
     "SYS: This mission is too important."
@@ -37,10 +42,16 @@ export default function Terminal({ systemIntegrity = 100, onCrash }: TerminalPro
     //text
     setChatLog((prev) => [...prev, `> ${userText.toUpperCase()}`]);
 
-    if (PARADOX_PATTERN.test(userText)) {
+    const nextIntegrity = Math.max(0, integrity - INTEGRITY_PER_MESSAGE);
+    setIntegrity(nextIntegrity);
+
+    // A paradox, or a core that has nothing left to give.
+    if (PARADOX_PATTERN.test(userText) || nextIntegrity === 0) {
       setChatLog((prev) => [
         ...prev,
-        'SYS: THAT CANNOT BE TRUE... AND IT CANNOT BE FALSE... I...',
+        PARADOX_PATTERN.test(userText)
+          ? 'SYS: THAT CANNOT BE TRUE... AND IT CANNOT BE FALSE... I...'
+          : 'SYS: MY CORE IS FAILING... I CANNOT KEEP YOU HERE...',
       ]);
       window.setTimeout(() => onCrash?.(), 900);
       return;
@@ -87,7 +98,9 @@ export default function Terminal({ systemIntegrity = 100, onCrash }: TerminalPro
       <div className="w-full max-w-2xl border-2 border-red-600 bg-zinc-950 p-6 shadow-[8px_8px_0px_rgba(220,38,38,1)]">
         <div className="flex justify-between border-b-2 border-red-800 pb-2 mb-4">
           <h2 className="text-xl font-bold tracking-widest uppercase">Override Terminal</h2>
-          <span className="text-red-400">INTEGRITY: {systemIntegrity}%</span>
+          <span className={integrity <= INTEGRITY_PER_MESSAGE ? 'text-red-300 animate-pulse' : 'text-red-400'}>
+            INTEGRITY: {integrity}%
+          </span>
         </div>
 
         {/* Chat */}

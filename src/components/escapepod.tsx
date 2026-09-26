@@ -55,13 +55,11 @@ export default function EscapePod({ onWin }: EscapePodProps) {
     let animationFrameId: number;
     let isRunning = true;
 
-    // Game Entities
     const player: Player = { x: 275, y: 350, width: 30, height: 30, speed: 5, dx: 0 };
     let bullets: Bullet[] = [];
     let asteroids: Asteroid[] = [];
     let frameCount = 0;
 
-    // Controls
     const keys: KeyState = { ArrowLeft: false, ArrowRight: false, Space: false };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -85,7 +83,6 @@ export default function EscapePod({ onWin }: EscapePodProps) {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
-    // Main Game Loop
     const update = () => {
       if (!isRunning) return;
 
@@ -93,7 +90,6 @@ export default function EscapePod({ onWin }: EscapePodProps) {
       ctx.fillStyle = '#050505';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 1. Move & Draw Player (Triangle)
       if (keys.ArrowLeft && player.x > 0) player.x -= player.speed;
       if (keys.ArrowRight && player.x + player.width < canvas.width) player.x += player.speed;
 
@@ -105,7 +101,6 @@ export default function EscapePod({ onWin }: EscapePodProps) {
       ctx.closePath();
       ctx.fill();
 
-      // 2. Spawn, Move & Draw Asteroids
       if (frameCount % 30 === 0) {
         asteroids.push({
           x: Math.random() * (canvas.width - 30),
@@ -123,12 +118,10 @@ export default function EscapePod({ onWin }: EscapePodProps) {
         ctx.fillStyle = '#ff0000';
         ctx.fillRect(ast.x, ast.y, ast.width, ast.height);
 
-        // Brutalist inner border for asteroids
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 2;
         ctx.strokeRect(ast.x, ast.y, ast.width, ast.height);
 
-        // Player collision check
         if (
           player.x < ast.x + ast.width &&
           player.x + player.width > ast.x &&
@@ -142,7 +135,6 @@ export default function EscapePod({ onWin }: EscapePodProps) {
         }
       }
 
-      // 3. Move & Draw Bullets + Bullet collisions
       for (let bIndex = bullets.length - 1; bIndex >= 0; bIndex--) {
         const bullet = bullets[bIndex];
         bullet.y -= bullet.speed;
@@ -166,7 +158,6 @@ export default function EscapePod({ onWin }: EscapePodProps) {
         }
       }
 
-      // Cleanup off-screen entities
       bullets = bullets.filter((b) => b.y > 0);
       asteroids = asteroids.filter((a) => a.y < canvas.height);
 
@@ -185,7 +176,6 @@ export default function EscapePod({ onWin }: EscapePodProps) {
     };
   }, [gameState]);
 
-  // Timer Countdown Logic
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined;
 
@@ -207,7 +197,6 @@ export default function EscapePod({ onWin }: EscapePodProps) {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center font-mono text-white selection:bg-none">
-      {/* UI Overlay */}
       <div className="w-full max-w-[600px] flex justify-between items-center mb-4 border-b-4 border-zinc-700 pb-2">
         <h2 className="text-2xl font-bold text-yellow-500 uppercase tracking-widest">Pod Navigation</h2>
         <div className={`text-2xl font-bold ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-green-500'}`}>

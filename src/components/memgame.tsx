@@ -2,10 +2,9 @@ import { useState, useRef, useCallback } from "react";
 import { playSfx } from "~/lib/sfx";
 
 const START_LENGTH = 3;
-// Climb from 3 up to 6 and you're through — no long haul to 12.
 const MAX_LENGTH = 6;
-const SHOW_DELAY_MS = 550; // time each key stays lit
-const GAP_MS = 250; // gap between lit keys
+const SHOW_DELAY_MS = 550;
+const GAP_MS = 250;
 const KEYS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
 type GameKey = (typeof KEYS)[number];
@@ -21,13 +20,12 @@ interface KeypadMemoryGameProps {
   onWin?: () => void;
 }
 
-// idle -> showing -> input -> (success -> showing | fail -> idle) -> won
 export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
   const [status, setStatus] = useState<GameStatus>("idle");
   const [sequence, setSequence] = useState<GameKey[]>([]);
   const [inputIndex, setInputIndex] = useState<number>(0);
-  const [activeKey, setActiveKey] = useState<GameKey | null>(null); // key currently lit (playback or press feedback)
-  const [flashKey, setFlashKey] = useState<FlashKeyState | null>(null); // feedback for input
+  const [activeKey, setActiveKey] = useState<GameKey | null>(null);
+  const [flashKey, setFlashKey] = useState<FlashKeyState | null>(null);
   const [best, setBest] = useState<number>(0);
 
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);

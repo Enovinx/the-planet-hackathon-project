@@ -6,11 +6,9 @@ export interface Pos {
   c: number;
 }
 
-/** Four pairs of endpoints: endpoints[colorId] = [a, b] */
 export interface GeneratorPuzzle {
   size: number;
   endpoints: [Pos, Pos][];
-  /** One known solution (full paths), useful for hints / testing. */
   solution?: Pos[][];
 }
 

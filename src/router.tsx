@@ -27,7 +27,7 @@ export function getRouter() {
     defaultPreload: 'intent',
     context: { queryClient },
     scrollRestoration: true,
-    defaultPreloadStaleTime: 0, // Let React Query handle all caching
+    defaultPreloadStaleTime: 0,
     defaultErrorComponent: (err) => (
       <p>{err.error instanceof Error ? err.error.stack : String(err.error)}</p>
     ),

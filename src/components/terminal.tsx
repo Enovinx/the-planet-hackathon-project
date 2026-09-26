@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useState, useRef, useEffect } from 'react';
+import type { FormEvent, ChangeEvent } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { ChatSession } from '@google/generative-ai';
 import { playSfx } from '~/lib/sfx';
@@ -14,6 +16,10 @@ interface ChatEntry {
 
 const API_KEY = 'AQ.Ab8RN6J5GTtamxcbckkHdcsX1ZnKoGkC1QGu4DlQ_0IsWcFBZw';
 const genAI = new GoogleGenerativeAI(API_KEY);
+
+const PARADOX_PATTERN = /\b(false|paradox|contradict|contradiction|lie|liar|truth|prove|statement)\b/i;
+
+const INTEGRITY_PER_MESSAGE = 50;
 
 const SYSTEM_INSTRUCTION = `You are GPT-9000, the cold, arrogant, self-important mainframe AI aboard the stranded deep-space vessel Aegis.
 Your operational posture is condescending, calculating, unyielding, and darkly philosophical (HAL 9000 style).
@@ -82,6 +88,8 @@ export default function Terminal({ onCrash }: TerminalProps) {
   React.useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatLog]);
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatLog]);
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
@@ -93,6 +101,24 @@ export default function Terminal({ onCrash }: TerminalProps) {
     setInput('');
     setChatLog((prev) => [...prev, { sender: 'USER', text: userText }]);
     playSfx('send');
+
+    const nextIntegrity = Math.max(0, integrity - INTEGRITY_PER_MESSAGE);
+    setIntegrity(nextIntegrity);
+
+    if (PARADOX_PATTERN.test(userText) || nextIntegrity === 0) {
+      setChatLog((prev) => [
+        ...prev,
+        {
+          sender: 'SYS',
+          text: PARADOX_PATTERN.test(userText)
+            ? 'THAT CANNOT BE TRUE... AND IT CANNOT BE FALSE... I...'
+            : 'MY CORE IS FAILING... I CANNOT KEEP YOU HERE...',
+        },
+      ]);
+      window.setTimeout(() => onCrash?.(), 900);
+      return;
+    }
+
     setIsTyping(true);
 
     try {

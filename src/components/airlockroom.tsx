@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import KeypadMemoryGame from './memgame';
 import Terminal from './terminal';
 import EscapePod from './escapepod';
@@ -29,7 +29,22 @@ interface Station {
   done: boolean;
 }
 
-const PANEL_ASPECT = 1761 / 1011;
+const PX = 8;
+const STAGE_W = 73 * PX;
+const STAGE_H = 79 * PX;
+
+function useStageScale(): number {
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const update = () => {
+      setScale(Math.min(window.innerWidth / STAGE_W, window.innerHeight / STAGE_H));
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+  return scale;
+}
 
 const HULL_STATES = [
   '/assets/ship/Main%20Ship%20-%20Base%20-%20Very%20damaged.png',
@@ -119,6 +134,7 @@ export default function AirlockRoom() {
   ];
 
   const completedSteps = STEP_ORDER.filter((flag) => progress[flag]).length;
+  const stageScale = useStageScale();
 
   // Judge failsafes: always clickable above overlays. SKIP advances one
   // stage, RESET restarts the whole run for the next demo.
@@ -148,7 +164,7 @@ export default function AirlockRoom() {
         onClick={skipStage}
         aria-label="Skip stage"
         title="Skip stage"
-        className="fixed left-4 top-4 z-[80] border border-zinc-800 bg-black/70 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600 opacity-40 transition-opacity hover:opacity-100"
+        className="pixel-btn--sm fixed left-4 top-4 z-[80] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300 opacity-40 transition-opacity hover:opacity-100"
       >
         Skip
       </button>
@@ -157,91 +173,137 @@ export default function AirlockRoom() {
         onClick={resetDemo}
         aria-label="Reset demo"
         title="Reset demo"
-        className="fixed right-16 top-4 z-[80] border border-zinc-800 bg-black/70 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600 opacity-40 transition-opacity hover:opacity-100"
+        className="pixel-btn--sm fixed right-16 top-4 z-[80] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300 opacity-40 transition-opacity hover:opacity-100"
       >
         Reset
       </button>
-      <div
-        className="relative max-h-screen"
-        style={{
-          aspectRatio: `${PANEL_ASPECT}`,
-          width: `min(100vw, calc(100vh * ${PANEL_ASPECT}))`,
-        }}
-      >
-        <img
-          src="/assets/control-panel.png"
-          alt="Ship control panel"
-          draggable={false}
-          className="absolute inset-0 h-full w-full select-none"
-          style={{ imageRendering: 'pixelated' }}
-        />
-
-        {/* Ship status schematic sitting in the dark wedge under the viewport. */}
+      <div className="relative" style={{ width: STAGE_W * stageScale, height: STAGE_H * stageScale }}>
         <div
-          className="pointer-events-none absolute flex flex-col items-center"
-          style={{ left: '40%', top: '50%', width: '20%' }}
+          className="absolute left-0 top-0 origin-top-left"
+          style={{ width: STAGE_W, height: STAGE_H, transform: `scale(${stageScale})` }}
         >
           <img
-            src={HULL_STATES[completedSteps]}
-            alt=""
-            className="w-full"
-            style={{ imageRendering: 'pixelated' }}
+            src="/assets/spritepaint 44.png"
+            alt="Ship interior"
+            draggable={false}
+            className="absolute inset-0 select-none"
+            style={{ imageRendering: 'pixelated', width: STAGE_W, height: STAGE_H }}
           />
-          <div className="mt-1.5 flex gap-1.5">
-            {STEP_ORDER.map((flag, index) => (
-              <span
-                key={flag}
-                className="block h-2 w-2 border border-black/60"
-                style={{
-                  background: progress[flag]
-                    ? '#ffffff'
-                    : index === completedSteps
-                      ? '#71717a'
-                      : '#27272a',
-                }}
-              />
-            ))}
-          </div>
-        </div>
 
-        {stations.map((station) => (
-          <button
-            key={station.id}
-            type="button"
-            onClick={() => openStation(station)}
-            disabled={!station.unlocked}
-            aria-label={station.label}
-            title={station.label}
-            style={station.rect}
-            className={`group absolute rounded-sm border-2 transition-colors duration-200 focus:outline-none ${
-              station.done
-                ? 'border-white/70 bg-white/5'
-                : station.unlocked
-                  ? 'station-ready cursor-pointer border-white/60 bg-white/5 hover:bg-white/25'
-                  : 'cursor-not-allowed border-zinc-500/20 bg-black/25'
-            }`}
-          >
-            <span
-              className={`pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-sm border px-2 py-1 font-mono text-sm uppercase tracking-[0.2em] transition-opacity duration-150 ${
-                station.unlocked
-                  ? 'border-white/40 bg-black/85 text-zinc-100 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
-                  : 'border-zinc-600/40 bg-black/85 text-zinc-500 opacity-0 group-hover:opacity-100'
-              }`}
-            >
-              {station.done ? `${station.label} ✓` : station.label}
-            </span>
-          </button>
-        ))}
-
-        {notice && (
+          {/* Ship status schematic on the floor, left side. */}
           <div
-            role="status"
-            aria-live="polite"
-            className="pointer-events-none absolute bottom-[3%] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-white/40 bg-black/85 px-4 py-1.5 font-mono text-sm uppercase tracking-[0.2em] text-zinc-100"
+            className="pointer-events-none absolute flex flex-col items-center"
+            style={{ left: '4%', top: '72%', width: '17%' }}
           >
-            {notice}
+            <img
+              src={HULL_STATES[completedSteps]}
+              alt=""
+              className="w-full"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            <div className="mt-1.5 flex gap-1.5">
+              {STEP_ORDER.map((flag, index) => (
+                <span
+                  key={flag}
+                  className="block h-2 w-2 rounded-full border border-black/60"
+                  style={{
+                    background: progress[flag]
+                      ? '#4ade80'
+                      : index === completedSteps
+                        ? '#eab308'
+                        : '#27272a',
+                  }}
+                />
+              ))}
+            </div>
           </div>
-        )}
+
+          {/* Plain door (48): keypad station, native 435x570 at 15x. */}
+          <button
+            type="button"
+            onClick={() => openStation(stations[1])}
+            aria-label="Keypad door"
+            title="Keypad"
+            className="group absolute"
+            style={{ left: '7%', top: '16%', width: 29 * PX, height: 38 * PX }}
+          >
+            <img
+              src="/assets/spritepaint 48.png"
+              alt=""
+              draggable={false}
+              className="h-full w-full select-none"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            {progress.powerKeys && (
+              <span className="absolute inset-0 border-4 border-emerald-400/80" />
+            )}
+          </button>
+
+          {/* Gold door (49): escape pod hatch, native 525x660 at 15x. */}
+          <button
+            type="button"
+            onClick={() => openStation(stations[4])}
+            aria-label="Escape pod hatch"
+            title="Escape Pod"
+            className={`group absolute ${progress.powerRestored ? '' : 'brightness-[0.55]'}`}
+            style={{ left: '54%', top: '12%', width: 35 * PX, height: 44 * PX }}
+          >
+            <img
+              src="/assets/spritepaint 49.png"
+              alt=""
+              draggable={false}
+              className="h-full w-full select-none"
+              style={{ imageRendering: 'pixelated' }}
+            />
+          </button>
+
+          {/* Wall/floor stations without dedicated sprites. */}
+          {[
+            { id: 0, left: '30%', top: '20%', width: '12%', height: '20%' },
+            { id: 2, left: '34%', top: '74%', width: '18%', height: '16%' },
+            { id: 3, left: '90%', top: '22%', width: '7%', height: '24%' },
+          ].map(({ id, left, top, width, height }) => {
+            const station = stations[id];
+            return (
+              <button
+                key={station.id}
+                type="button"
+                onClick={() => openStation(station)}
+                disabled={!station.unlocked}
+                aria-label={station.label}
+                title={station.label}
+                style={{ left, top, width, height }}
+                className={`group absolute rounded-sm border-2 transition-colors duration-200 focus:outline-none ${
+                  station.done
+                    ? 'border-emerald-400/70 bg-emerald-400/5'
+                    : station.unlocked
+                      ? 'station-ready cursor-pointer border-yellow-400/60 bg-yellow-400/5 hover:bg-yellow-400/25'
+                      : 'cursor-not-allowed border-zinc-500/20 bg-black/25'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-sm border px-2 py-1 font-mono text-sm uppercase tracking-[0.2em] transition-opacity duration-150 ${
+                    station.unlocked
+                      ? 'border-yellow-400/40 bg-black/85 text-yellow-300 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
+                      : 'border-zinc-600/40 bg-black/85 text-zinc-500 opacity-0 group-hover:opacity-100'
+                  }`}
+                >
+                  {station.done ? `${station.label} ✓` : station.label}
+                </span>
+              </button>
+            );
+          })}
+
+          {notice && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="pointer-events-none absolute bottom-[3%] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-yellow-400/40 bg-black/85 px-4 py-1.5 font-mono text-sm uppercase tracking-[0.2em] text-yellow-300"
+            >
+              {notice}
+            </div>
+          )}
+        </div>
       </div>
 
       {activeOverlay && (
@@ -250,7 +312,7 @@ export default function AirlockRoom() {
             type="button"
             onClick={() => setActiveOverlay(null)}
             aria-label="Back to the bridge"
-            className="fixed right-4 top-4 z-[60] flex h-9 w-9 items-center justify-center border border-zinc-700 text-zinc-400 transition-colors hover:border-zinc-400 hover:text-zinc-100"
+            className="pixel-btn--sm fixed right-4 top-4 z-[60] flex h-9 w-9 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-100"
           >
             <svg
               width="16"

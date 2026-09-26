@@ -50,18 +50,25 @@ export default function OxygenMeter({ onRestart }: OxygenMeterProps) {
   const low = remaining <= LOW_PERCENT && !dead;
   const critical = dead || low;
   const barWidth = `${(remaining / START_PERCENT) * 100}%`;
+  const valueTone = dead
+    ? 'text-red-500'
+    : low
+      ? 'text-red-400'
+      : remaining <= START_PERCENT / 2
+        ? 'text-amber-400'
+        : 'text-cyan-400';
 
   return (
     <>
       <div className="pointer-events-none fixed right-4 top-4 z-[60] select-none font-mono">
         <div
-          className={`border-2 bg-black px-3 py-2 ${
-            critical ? 'border-white' : 'border-zinc-600'
+          className={`border-2 bg-black/70 px-3 py-2 backdrop-blur-sm ${
+            critical ? 'border-red-500/60' : 'border-cyan-500/30'
           }`}
         >
           <div className="flex items-center justify-between gap-6">
             <span
-              className={`text-lg font-bold uppercase tabular-nums text-zinc-100 ${
+              className={`text-lg font-bold uppercase tabular-nums ${valueTone} ${
                 low ? 'animate-pulse' : ''
               }`}
             >
@@ -70,7 +77,9 @@ export default function OxygenMeter({ onRestart }: OxygenMeterProps) {
           </div>
           <div className="mt-2 h-1.5 w-40 bg-zinc-800">
             <div
-              className="h-full bg-white transition-[width] duration-200"
+              className={`h-full transition-[width] duration-200 ${
+                critical ? 'bg-red-500' : 'bg-cyan-500'
+              }`}
               style={{ width: barWidth }}
             />
           </div>
@@ -79,13 +88,13 @@ export default function OxygenMeter({ onRestart }: OxygenMeterProps) {
 
       {dead && (
         <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center gap-4 bg-black px-6 text-center font-mono text-white">
-          <h1 className="text-4xl font-bold uppercase tracking-widest text-zinc-100 sm:text-7xl">
+          <h1 className="text-4xl font-bold uppercase tracking-widest text-red-500 sm:text-7xl">
             Oxygen Depleted
           </h1>
           <button
             type="button"
             onClick={restart}
-            className="mt-6 border-2 border-white bg-white px-8 py-3 text-base font-bold uppercase tracking-[0.35em] text-black transition-colors hover:bg-zinc-300"
+            className="pixel-btn mt-6 px-8 py-3 text-base font-bold uppercase tracking-[0.35em] text-black"
           >
             Try Again
           </button>

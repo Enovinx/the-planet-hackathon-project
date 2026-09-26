@@ -38,10 +38,22 @@ interface KeyState {
   Space: boolean;
 }
 
+const ROCKET_SRC = '/assets/spritepaint 45.png';
+const ASTEROID_SRC = '/assets/spritepaint 43.png';
+
 export default function EscapePod({ onWin }: EscapePodProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>('START');
   const [timeLeft, setTimeLeft] = useState<number>(20);
+  const spritesRef = useRef<{ rocket?: HTMLImageElement; asteroid?: HTMLImageElement }>({});
+
+  useEffect(() => {
+    const rocket = new Image();
+    rocket.src = ROCKET_SRC;
+    const asteroid = new Image();
+    asteroid.src = ASTEROID_SRC;
+    spritesRef.current = { rocket, asteroid };
+  }, []);
 
   useEffect(() => {
     if (gameState !== 'PLAYING') return;
@@ -54,6 +66,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
 
     let animationFrameId: number;
     let isRunning = true;
+    ctx.imageSmoothingEnabled = false;
 
     const player: Player = { x: 275, y: 350, width: 30, height: 30, speed: 5, dx: 0 };
     let bullets: Bullet[] = [];
@@ -162,16 +175,21 @@ export default function EscapePod({ onWin }: EscapePodProps) {
       if (keys.ArrowRight && player.x + player.width < canvas.width) player.x += player.speed;
 
       if ((keys.ArrowLeft || keys.ArrowRight) && frameCount % 3 === 0) {
-        burst(player.x + 15, player.y + 30, '#a1a1aa', 1, 1.5);
+        burst(player.x + 15, player.y + 30, '#00ccff', 1, 1.5);
       }
 
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.moveTo(player.x + 15, player.y);
-      ctx.lineTo(player.x + 30, player.y + 30);
-      ctx.lineTo(player.x, player.y + 30);
-      ctx.closePath();
-      ctx.fill();
+      const rocket = spritesRef.current.rocket;
+      if (rocket && rocket.complete && rocket.naturalWidth > 0) {
+        ctx.drawImage(rocket, player.x + 15 - 55 / 2, player.y + 30 - 74, 55, 74);
+      } else {
+        ctx.fillStyle = '#00ff00';
+        ctx.beginPath();
+        ctx.moveTo(player.x + 15, player.y);
+        ctx.lineTo(player.x + 30, player.y + 30);
+        ctx.lineTo(player.x, player.y + 30);
+        ctx.closePath();
+        ctx.fill();
+      }
 
       if (frameCount % 30 === 0) {
         asteroids.push({
@@ -187,12 +205,13 @@ export default function EscapePod({ onWin }: EscapePodProps) {
         const ast = asteroids[i];
         ast.y += ast.speed;
 
-        ctx.fillStyle = '#71717a';
-        ctx.fillRect(ast.x, ast.y, ast.width, ast.height);
-
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(ast.x, ast.y, ast.width, ast.height);
+        const asteroid = spritesRef.current.asteroid;
+        if (asteroid && asteroid.complete && asteroid.naturalWidth > 0) {
+          ctx.drawImage(asteroid, ast.x, ast.y, 30, 30);
+        } else {
+          ctx.fillStyle = '#ff0000';
+          ctx.fillRect(ast.x, ast.y, ast.width, ast.height);
+        }
 
         if (
           player.x < ast.x + ast.width &&
@@ -214,7 +233,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
         const bullet = bullets[bIndex];
         bullet.y -= bullet.speed;
 
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#ffff00';
         ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
 
         for (let aIndex = asteroids.length - 1; aIndex >= 0; aIndex--) {
@@ -227,8 +246,8 @@ export default function EscapePod({ onWin }: EscapePodProps) {
           ) {
             asteroids.splice(aIndex, 1);
             bullets.splice(bIndex, 1);
-            burst(ast.x + 15, ast.y + 15, '#ffffff', 14, 3);
-            burst(ast.x + 15, ast.y + 15, '#a1a1aa', 5, 2);
+            burst(ast.x + 15, ast.y + 15, '#ff3300', 14, 3);
+            burst(ast.x + 15, ast.y + 15, '#ffffff', 5, 2);
             shake = 6;
             playSfx('explode');
             break;
@@ -289,25 +308,25 @@ export default function EscapePod({ onWin }: EscapePodProps) {
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center font-mono text-white selection:bg-none">
       <div className="w-full max-w-[600px] flex justify-between items-center mb-4 border-b-4 border-zinc-700 pb-2">
-        <h2 className="text-2xl font-bold text-zinc-100 uppercase tracking-widest">Pod Navigation</h2>
-        <div className={`text-2xl font-bold ${timeLeft < 10 ? 'bg-white px-2 text-black animate-pulse' : 'text-zinc-100'}`}>
+        <h2 className="text-2xl font-bold text-yellow-500 uppercase tracking-widest">Pod Navigation</h2>
+        <div className={`text-2xl font-bold ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-green-500'}`}>
           T-MINUS: {timeLeft}s
         </div>
       </div>
 
       {/* The Game Canvas - Brutalist styling */}
-      <div className="relative border-4 border-white bg-zinc-950 shadow-[8px_8px_0px_#ffffff]">
+      <div className="relative border-4 border-zinc-500 bg-zinc-950 shadow-[8px_8px_0px_#3f3f46]">
         {/* Game Over / Start Screens Overlay */}
         {gameState !== 'PLAYING' && (
           <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-10 p-8 text-center">
             {gameState === 'START' && (
               <>
-                <h1 className="text-3xl text-zinc-100 font-bold mb-4">RADIATION DEBRIS FIELD</h1>
+                <h1 className="text-3xl text-yellow-500 font-bold mb-4">RADIATION DEBRIS FIELD</h1>
                 <p className="mb-6 text-lg font-bold text-zinc-100">Use LEFT/RIGHT arrows to move. SPACE to fire lasers.</p>
                 <button
                   type="button"
                   onClick={() => setGameState('PLAYING')}
-                  className="px-6 py-3 bg-white text-black font-bold text-xl hover:bg-zinc-300 border-2 border-white"
+                  className="pixel-btn px-6 py-3 font-bold text-xl text-black"
                 >
                   INITIATE LAUNCH
                 </button>
@@ -315,14 +334,14 @@ export default function EscapePod({ onWin }: EscapePodProps) {
             )}
             {gameState === 'GAME_OVER' && (
               <>
-                <h1 className="text-4xl text-zinc-100 font-bold mb-4">HULL BREACH</h1>
+                <h1 className="text-4xl text-red-600 font-bold mb-4">HULL BREACH</h1>
                 <button
                   type="button"
                   onClick={() => {
                     setGameState('START');
                     setTimeLeft(20);
                   }}
-                  className="px-6 py-3 bg-black text-zinc-100 font-bold text-xl hover:bg-zinc-900 border-2 border-white"
+                  className="pixel-btn px-6 py-3 font-bold text-xl text-black"
                 >
                   REBOOT SYSTEMS
                 </button>
@@ -330,8 +349,8 @@ export default function EscapePod({ onWin }: EscapePodProps) {
             )}
             {gameState === 'WIN' && (
               <>
-                <h1 className="text-4xl text-zinc-100 font-bold mb-4 animate-pulse">CLEARED DEBRIS FIELD</h1>
-                <p className="text-xl text-zinc-400">RESCUE FLEET REACHED.</p>
+                <h1 className="text-4xl text-green-500 font-bold mb-4 animate-pulse">CLEARED DEBRIS FIELD</h1>
+                <p className="text-xl text-yellow-500">RESCUE FLEET REACHED.</p>
               </>
             )}
           </div>

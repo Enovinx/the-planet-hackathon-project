@@ -150,6 +150,7 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
             const flash = flashKey && flashKey.key === key ? flashKey : null;
             const classes = [
               "kpm-key",
+              "pixel-btn",
               isActive ? "kpm-key--lit" : "",
               flash ? (flash.correct ? "kpm-key--good" : "kpm-key--bad") : "",
             ]
@@ -164,7 +165,7 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
                 onClick={() => handleKeyPress(key)}
                 aria-label={`Key ${key}`}
               >
-                {key}
+                <span className="relative z-10">{key}</span>
               </button>
             );
           })}
@@ -172,17 +173,17 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
 
         <div className="kpm-controls">
           {status === "idle" && (
-            <button className="kpm-btn kpm-btn--primary" onClick={startGame}>
+            <button className="kpm-btn kpm-btn--primary pixel-btn" onClick={startGame}>
               Engage uplink
             </button>
           )}
           {(status === "fail" || status === "won") && (
-            <button className="kpm-btn kpm-btn--primary" onClick={startGame}>
+            <button className="kpm-btn kpm-btn--primary pixel-btn" onClick={startGame}>
               Retry uplink
             </button>
           )}
           {status !== "idle" && (
-            <button className="kpm-btn kpm-btn--ghost" onClick={reset}>
+            <button className="kpm-btn kpm-btn--ghost pixel-btn" onClick={reset}>
               Abort
             </button>
           )}
@@ -194,14 +195,14 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
 
 const CSS = `
 .kpm-wrap {
-  --kpm-hull: #000000;
-  --kpm-panel: #0a0a0a;
-  --kpm-rivet: #ffffff;
-  --kpm-text: #ffffff;
-  --kpm-muted: #a1a1aa;
-  --kpm-accent: #ffffff;
-  --kpm-accent-dim: #71717a;
-  --kpm-bad: #52525b;
+  --kpm-hull: #050505;
+  --kpm-panel: #0f0505;
+  --kpm-rivet: #dc2626;
+  --kpm-text: #ef4444;
+  --kpm-muted: #fca5a5;
+  --kpm-accent: #fbbf24;
+  --kpm-accent-dim: #b45309;
+  --kpm-bad: #ff3b3b;
   min-height: 100%;
   width: 100%;
   display: flex;
@@ -223,11 +224,14 @@ const CSS = `
   border-radius: 0px;
   padding: 26px 22px 22px;
   position: relative;
-  box-shadow: 8px 8px 0 #ffffff;
+  box-shadow: 0 0 50px rgba(255, 0, 0, 0.25);
 }
 .kpm-card::before,
 .kpm-card::after {
-  content: none;
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
 }
 
 .kpm-header {
@@ -246,6 +250,7 @@ const CSS = `
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--kpm-text);
+  text-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
 }
 .kpm-tier {
   font-size: 14px;
@@ -279,35 +284,30 @@ const CSS = `
 .kpm-key {
   aspect-ratio: 1 / 1;
   border-radius: 0px;
-  border: 2px solid var(--kpm-rivet);
-  background: var(--kpm-hull);
   color: var(--kpm-text);
   font-size: 22px;
   font-weight: 900;
   cursor: pointer;
   font-family: inherit;
-  transition: background 100ms ease, box-shadow 100ms ease;
+  position: relative;
+  transition: filter 100ms ease;
 }
+
+.kpm-key::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.kpm-key--lit::after { background: rgba(251, 191, 36, 0.75); }
+.kpm-key--good::after { background: rgba(34, 197, 94, 0.6); }
+.kpm-key--bad::after { background: rgba(239, 68, 68, 0.65); }
 .kpm-key:disabled { cursor: default; opacity: 0.35; }
 .kpm-key:not(:disabled):active {
   transform: translateY(1px);
 }
 
-.kpm-key--lit {
-  background: var(--kpm-accent);
-  border-color: var(--kpm-accent);
-  color: #000000;
-}
-.kpm-key--good {
-  background: #ffffff;
-  border-color: #ffffff;
-  color: #000000;
-}
-.kpm-key--bad {
-  background: #000000;
-  border-color: var(--kpm-bad);
-  color: #a1a1aa;
-}
+
 
 .kpm-controls {
   display: flex;
@@ -331,7 +331,7 @@ const CSS = `
 .kpm-btn--primary {
   background: var(--kpm-accent);
   border-color: var(--kpm-accent);
-  color: #000000;
+  color: #1a1104;
 }
 .kpm-btn--ghost {
   color: var(--kpm-muted);

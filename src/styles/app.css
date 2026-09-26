@@ -267,3 +267,15 @@
     animation: none;
   }
 }
+
+button.pixel-btn {
+  border: 8px solid transparent;
+  border-image: url('/assets/spritepaint 41.png') 5 fill / 8px stretch;
+  image-rendering: pixelated;
+}
+
+button.pixel-btn--sm {
+  border: 6px solid transparent;
+  border-image: url('/assets/spritepaint 41.png') 5 fill / 6px stretch;
+  image-rendering: pixelated;
+}

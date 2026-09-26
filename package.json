@@ -8,7 +8,7 @@
     "convex-dev": "convex dev",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run typecheck && vite build",
-    "start": "node .output/server/index.mjs",
+    "start": "node dist/server/server.js",
     "format": "prettier --write .",
     "lint": "pnpm run typecheck && eslint . --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run"

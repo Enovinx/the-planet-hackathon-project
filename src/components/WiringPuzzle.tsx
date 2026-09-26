@@ -218,7 +218,7 @@ export default function WiringPuzzle({ seed, onSolved }: Props) {
 
     const terminal = terminalAt(event.clientX, event.clientY);
 
-    // Released over empty panel — abandon the drag.
+    // Released over empty panel, abandon the drag.
     if (!terminal) {
       setActive(null);
       return;
@@ -259,13 +259,10 @@ export default function WiringPuzzle({ seed, onSolved }: Props) {
   return (
     <div className="w-full max-w-xl select-none">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-mono text-xs uppercase tracking-[0.3em] text-zinc-400">
+        <h2 className="font-mono text-base font-bold uppercase tracking-[0.3em] text-zinc-100">
           Wiring Panel
         </h2>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-            Drag or tap matching terminals
-          </span>
           <button
             type="button"
             onClick={reset}
@@ -422,7 +419,7 @@ export default function WiringPuzzle({ seed, onSolved }: Props) {
             <span
               role="status"
               aria-live="polite"
-              className={`font-mono text-[10px] uppercase tracking-[0.3em] ${
+              className={`font-mono text-sm uppercase tracking-[0.3em] ${
                 solved ? 'text-lime-400' : 'text-red-500'
               }`}
             >

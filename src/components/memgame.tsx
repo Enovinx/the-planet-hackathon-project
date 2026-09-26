@@ -26,7 +26,6 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
   const [inputIndex, setInputIndex] = useState<number>(0);
   const [activeKey, setActiveKey] = useState<GameKey | null>(null);
   const [flashKey, setFlashKey] = useState<FlashKeyState | null>(null);
-  const [best, setBest] = useState<number>(0);
 
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -85,7 +84,6 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
     if (!correct) {
       setStatus("fail");
       playSfx("keyBad");
-      setBest((b) => Math.max(b, sequence.length - 1));
       return;
     }
 
@@ -93,7 +91,6 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
     if (nextIndex === sequence.length) {
       if (sequence.length === MAX_LENGTH) {
         setStatus("won");
-        setBest(MAX_LENGTH);
         playSfx("win");
         onWin?.();
       } else {
@@ -120,10 +117,10 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
 
   const statusText: Record<GameStatus, string> = {
     idle: "Initiate uplink to begin authorization",
-    showing: "Relay transmitting code — observe",
+    showing: "Relay transmitting code: observe",
     input: "Re-enter the transmitted sequence",
     success: "Code accepted. Escalating clearance...",
-    fail: `Sequence rejected — breach at tier ${sequence.length}`,
+    fail: `Sequence rejected: breach at tier ${sequence.length}`,
     won: "Override complete. Full ship access granted.",
   };
 
@@ -133,22 +130,11 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
 
       <div className="kpm-card">
         <header className="kpm-header">
-          <span className="kpm-eyebrow">Nav Computer // Auth Relay</span>
           <h1 className="kpm-title">Access Terminal</h1>
+          <span className="kpm-tier">
+            Tier {status === "idle" ? "0" : level} / {MAX_LENGTH}
+          </span>
         </header>
-
-        <div className="kpm-meta">
-          <div className="kpm-meta-item">
-            <span className="kpm-meta-label">Clearance Tier</span>
-            <span className="kpm-meta-value">
-              {status === "idle" ? "—" : `${level} / ${MAX_LENGTH}`}
-            </span>
-          </div>
-          <div className="kpm-meta-item">
-            <span className="kpm-meta-label">Max Tier</span>
-            <span className="kpm-meta-value">{best}</span>
-          </div>
-        </div>
 
         <p
           className={`kpm-status kpm-status--${status}`}
@@ -208,14 +194,13 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
 
 const CSS = `
 .kpm-wrap {
-  --kpm-hull: #0a0a12;
-  --kpm-hull-2: #0a0a12;
-  --kpm-panel: #6c4cff;
-  --kpm-rivet: #000000;
-  --kpm-text: #ffffff;
-  --kpm-muted: #d8d0ff;
-  --kpm-accent: #ffe600;
-  --kpm-accent-dim: #b3a400;
+  --kpm-hull: #050505;
+  --kpm-panel: #0f0505;
+  --kpm-rivet: #dc2626;
+  --kpm-text: #ef4444;
+  --kpm-muted: #fca5a5;
+  --kpm-accent: #fbbf24;
+  --kpm-accent-dim: #b45309;
   --kpm-bad: #ff3b3b;
   min-height: 100%;
   width: 100%;
@@ -223,14 +208,8 @@ const CSS = `
   align-items: center;
   justify-content: center;
   padding: 32px 16px;
-  background:
-    radial-gradient(2px 2px at 20% 30%, #ffffff 0%, transparent 60%),
-    radial-gradient(2px 2px at 70% 15%, #ffffff 0%, transparent 60%),
-    radial-gradient(1.5px 1.5px at 85% 60%, #ffffff 0%, transparent 60%),
-    radial-gradient(1.5px 1.5px at 40% 80%, #ffffff 0%, transparent 60%),
-    radial-gradient(1.5px 1.5px at 10% 65%, #ffffff 0%, transparent 60%),
-    var(--kpm-hull);
-  font-family: "Space Mono", "Courier New", ui-monospace, monospace;
+  background: var(--kpm-hull);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
   color: var(--kpm-text);
   box-sizing: border-box;
 }
@@ -238,91 +217,55 @@ const CSS = `
 
 .kpm-card {
   width: 100%;
-  max-width: 380px;
+  max-width: 420px;
   background: var(--kpm-panel);
-  border: 4px solid var(--kpm-rivet);
+  border: 2px solid var(--kpm-rivet);
   border-radius: 0px;
   padding: 26px 22px 22px;
   position: relative;
-  box-shadow: 10px 10px 0 var(--kpm-rivet);
+  box-shadow: 0 0 50px rgba(255, 0, 0, 0.25);
 }
 .kpm-card::before,
 .kpm-card::after {
   content: "";
   position: absolute;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--kpm-accent);
-  border: 3px solid var(--kpm-rivet);
-  top: -7px;
+  width: 0;
+  height: 0;
 }
-.kpm-card::before { left: -7px; }
-.kpm-card::after { right: -7px; }
 
 .kpm-header {
-  margin-bottom: 16px;
-  border-bottom: 4px solid var(--kpm-rivet);
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--kpm-rivet);
   padding-bottom: 12px;
-}
-.kpm-eyebrow {
-  display: block;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  color: var(--kpm-hull);
-  background: var(--kpm-accent);
-  border: 2px solid var(--kpm-rivet);
-  padding: 2px 6px;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  font-weight: 700;
-  width: fit-content;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
 }
 .kpm-title {
   margin: 0;
-  font-size: 26px;
-  font-weight: 900;
-  letter-spacing: 0.02em;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--kpm-text);
-  -webkit-text-stroke: 1px var(--kpm-rivet);
+  text-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
 }
-
-.kpm-meta {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.kpm-meta-item {
-  flex: 1;
-  background: var(--kpm-hull);
-  border: 3px solid var(--kpm-rivet);
-  border-radius: 0px;
-  padding: 8px 12px;
-  box-shadow: 4px 4px 0 var(--kpm-rivet);
-}
-.kpm-meta-label {
-  display: block;
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--kpm-muted);
-  margin-bottom: 3px;
+.kpm-tier {
+  font-size: 14px;
   font-weight: 700;
-}
-.kpm-meta-value {
-  font-size: 18px;
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
   color: var(--kpm-accent);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .kpm-status {
   min-height: 20px;
   margin: 0 0 18px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  color: var(--kpm-text);
+  color: var(--kpm-muted);
   letter-spacing: 0.01em;
   text-transform: uppercase;
 }
@@ -340,35 +283,36 @@ const CSS = `
 .kpm-key {
   aspect-ratio: 1 / 1;
   border-radius: 0px;
-  border: 3px solid var(--kpm-rivet);
+  border: 2px solid var(--kpm-rivet);
   background: var(--kpm-hull);
   color: var(--kpm-text);
   font-size: 22px;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 5px 5px 0 var(--kpm-rivet);
-  transition: transform 80ms ease, box-shadow 80ms ease, background 100ms ease;
+  font-family: inherit;
+  transition: background 100ms ease, box-shadow 100ms ease;
 }
-.kpm-key:disabled { cursor: default; opacity: 0.5; }
+.kpm-key:disabled { cursor: default; opacity: 0.35; }
 .kpm-key:not(:disabled):active {
-  transform: translate(5px, 5px);
-  box-shadow: 0 0 0 var(--kpm-rivet);
+  transform: translateY(1px);
 }
 
 .kpm-key--lit {
   background: var(--kpm-accent);
-  border-color: var(--kpm-rivet);
-  color: var(--kpm-hull);
+  border-color: var(--kpm-accent);
+  color: #1a1104;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.5);
 }
 .kpm-key--good {
-  background: #00e07a;
-  border-color: var(--kpm-rivet);
-  color: var(--kpm-hull);
+  background: #166534;
+  border-color: #22c55e;
+  color: #4ade80;
 }
 .kpm-key--bad {
-  background: var(--kpm-bad);
-  border-color: var(--kpm-rivet);
-  color: var(--kpm-hull);
+  background: #450a0a;
+  border-color: var(--kpm-bad);
+  color: #f87171;
+  box-shadow: 0 0 18px rgba(255, 59, 59, 0.5);
 }
 
 .kpm-controls {
@@ -380,28 +324,23 @@ const CSS = `
   flex: 1;
   padding: 12px 14px;
   border-radius: 0px;
-  font-size: 13px;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
-  border: 3px solid var(--kpm-rivet);
+  border: 2px solid var(--kpm-rivet);
   background: var(--kpm-hull);
   color: var(--kpm-text);
-  box-shadow: 5px 5px 0 var(--kpm-rivet);
-  transition: transform 80ms ease, box-shadow 80ms ease;
-}
-.kpm-btn:active {
-  transform: translate(5px, 5px);
-  box-shadow: 0 0 0 var(--kpm-rivet);
+  font-family: inherit;
 }
 .kpm-btn--primary {
   background: var(--kpm-accent);
-  color: var(--kpm-hull);
+  border-color: var(--kpm-accent);
+  color: #1a1104;
 }
 .kpm-btn--ghost {
-  background: var(--kpm-panel);
-  color: var(--kpm-text);
+  color: var(--kpm-muted);
 }
 
 .kpm-key:focus-visible,

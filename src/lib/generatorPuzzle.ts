@@ -28,7 +28,7 @@ export function inBounds(p: Pos, size: number = GRID_SIZE): boolean {
   return p.r >= 0 && p.r < size && p.c >= 0 && p.c < size;
 }
 
-/** mulberry32 — small seeded RNG so puzzles are reproducible per seed. */
+/** mulberry32: small seeded RNG so puzzles are reproducible per seed. */
 export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
@@ -121,7 +121,7 @@ function findHamiltonianPath(
       const nbs = shuffle(neighbors(cell, size), rand).filter(
         (n) => !visited[idx(n.r, n.c)],
       );
-      // Fewest onward moves first — prunes dead ends early.
+      // Fewest onward moves first, pruning dead ends early.
       nbs.sort(
         (a, b) =>
           neighbors(a, size).filter((n) => !visited[idx(n.r, n.c)]).length -
@@ -246,7 +246,7 @@ export function generatePuzzle(seed?: number): GeneratorPuzzle {
   return FALLBACK_PUZZLE;
 }
 
-/** Hand-designed fallback — four spread-out pairs on 8x8. */
+/** Hand-designed fallback: four spread-out pairs on 8x8. */
 export const FALLBACK_PUZZLE: GeneratorPuzzle = {
   size: GRID_SIZE,
   endpoints: [
@@ -303,7 +303,7 @@ export function isSolved(
   return true;
 }
 
-/** Fraction of cells covered by any path (0..1) — for bonus display. */
+/** Fraction of cells covered by any path (0..1), for bonus display. */
 export function coverage(paths: Pos[][], size: number = GRID_SIZE): number {
   const seen = new Set<string>();
   for (const path of paths) for (const cell of path) seen.add(posKey(cell));

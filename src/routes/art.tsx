@@ -5,7 +5,7 @@ export const Route = createFileRoute('/art')({
   component: ArtPage,
 });
 
-const SCALE = 15; // 1 source pixel = 15 CSS pixels, identical for every sprite
+const SCALE = 15;
 
 const SPRITES = [
   'spritepaint 44.png',
@@ -20,8 +20,6 @@ function SpriteCard({ file }: { file: string }) {
   );
   const imgRef = React.useRef<HTMLImageElement>(null);
 
-  // Cached images can finish loading before hydration attaches onLoad,
-  // so measure imperatively as well.
   React.useEffect(() => {
     const img = imgRef.current;
     if (img && img.complete && img.naturalWidth > 0) {

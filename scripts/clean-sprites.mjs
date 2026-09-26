@@ -1,15 +1,10 @@
-// Usage: node scripts/clean-sprites.mjs [spriteId ...]   (default: 44 45 48 49)
-//       node scripts/clean-sprites.mjs --verify
-// Flood-fills from the borders turning white/near-white pixels transparent
-// (interior white pixels are left alone), then crops to the bounding box of
-// remaining colored pixels. Zero dependencies: PNG via node:zlib.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { deflateSync, inflateSync } from 'node:zlib';
 import { resolve } from 'node:path';
 
 const argIds = process.argv.slice(2).filter((a) => /^\d+$/.test(a)).map(Number);
 const FILES = argIds.length > 0 ? argIds : [44, 45, 48, 49];
-const NEAR_WHITE_DIFF = 12; // max per-channel distance from pure white to count as white
+const NEAR_WHITE_DIFF = 12;
 
 function crc32(buf) {
   let table = crc32.table;
@@ -40,12 +35,12 @@ function encodePng(width, height, rgba) {
   const ihdr = Buffer.alloc(13);
   ihdr.writeUInt32BE(width, 0);
   ihdr.writeUInt32BE(height, 4);
-  ihdr[8] = 8; // bit depth
-  ihdr[9] = 6; // color type RGBA
+  ihdr[8] = 8;
+  ihdr[9] = 6;
   const stride = width * 4;
   const raw = Buffer.alloc((stride + 1) * height);
   for (let y = 0; y < height; y++) {
-    raw[y * (stride + 1)] = 0; // filter type: none
+    raw[y * (stride + 1)] = 0;
     rgba.copy(raw, y * (stride + 1) + 1, y * stride, (y + 1) * stride);
   }
   const idat = deflateSync(raw, { level: 9 });

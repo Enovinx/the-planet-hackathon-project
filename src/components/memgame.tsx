@@ -113,16 +113,15 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
     setFlashKey(null);
   };
 
-  const level = Math.max(sequence.length, START_LENGTH);
-
   const statusText: Record<GameStatus, string> = {
-    idle: "Initiate uplink to begin authorization",
-    showing: "Relay transmitting code: observe",
-    input: "Re-enter the transmitted sequence",
-    success: "Code accepted. Escalating clearance...",
-    fail: `Sequence rejected: breach at tier ${sequence.length}`,
-    won: "Override complete. Full ship access granted.",
+    idle: "",
+    showing: "",
+    input: "",
+    success: "",
+    fail: "",
+    won: "",
   };
+  void statusText;
 
   return (
     <div className="kpm-wrap">
@@ -132,17 +131,9 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
         <header className="kpm-header">
           <h1 className="kpm-title">Access Terminal</h1>
           <span className="kpm-tier">
-            Tier {status === "idle" ? "0" : level} / {MAX_LENGTH}
+            {Math.max(sequence.length, START_LENGTH)} / {MAX_LENGTH}
           </span>
         </header>
-
-        <p
-          className={`kpm-status kpm-status--${status}`}
-          role="status"
-          aria-live="polite"
-        >
-          {statusText[status]}
-        </p>
 
         <div className="kpm-grid">
           {KEYS.map((key) => {

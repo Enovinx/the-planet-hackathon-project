@@ -44,7 +44,7 @@ const ASTEROID_SRC = '/assets/spritepaint 43.png';
 export default function EscapePod({ onWin }: EscapePodProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>('START');
-  const [timeLeft, setTimeLeft] = useState<number>(3); // TEMP-TEST: revert to 20
+  const [timeLeft, setTimeLeft] = useState<number>(3);
   const spritesRef = useRef<{ rocket?: HTMLImageElement; asteroid?: HTMLImageElement }>({});
 
   useEffect(() => {

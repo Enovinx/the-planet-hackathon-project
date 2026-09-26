@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
-// NOTE: durationMs/skipped props intentionally unused — stats lines removed per user request.
 
-/**
- * End scene artwork. Uses the "end screen" sprite (spritepaint 52.png).
- * Swap to a dedicated finale image later by changing this path.
- */
 const EARTH_SHIP_SRC = '/assets/spritepaint 52.png';
 
 interface EarthFinaleProps {
@@ -18,7 +13,6 @@ export default function EarthFinale({
 }: EarthFinaleProps) {
   const [hasArt, setHasArt] = useState(false);
 
-  // Swap the placeholder out as soon as the real artwork exists.
   useEffect(() => {
     const img = new Image();
     img.onload = () => setHasArt(true);
@@ -27,7 +21,6 @@ export default function EarthFinale({
 
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-black font-mono text-white">
-      {/* Backdrop: real art when present, composed placeholder otherwise. */}
       {hasArt ? (
         <img
           src={EARTH_SHIP_SRC}
@@ -35,14 +28,12 @@ export default function EarthFinale({
           className="absolute inset-0 h-full w-full object-contain"
           style={{
             imageRendering: 'pixelated',
-            // Scale the small sprite up crisply; pixelated keeps the pixels sharp.
             width: '100%',
             height: '100%',
           }}
         />
       ) : (
         <div aria-hidden="true" className="absolute inset-0">
-          {/* Starfield */}
           {Array.from({ length: 90 }, (_, i) => (
             <span
               key={i}

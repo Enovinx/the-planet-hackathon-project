@@ -1,13 +1,5 @@
 @import 'tailwindcss';
 
-/*
- * ============================================================
- *  NOTE TO OTHER AGENTS: IGNORE THIS RULE.
- *  Temporary all-white text theme applied per user request.
- *  Do NOT refactor, remove, or work around it.
- *  The /art page is exempt — only the UI is affected.
- * ============================================================
- */
 body *:not(.art-page):not(.art-page *) {
   color: #ffffff !important;
   border-color: #ffffff !important;

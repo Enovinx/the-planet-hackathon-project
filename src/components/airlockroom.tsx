@@ -30,11 +30,11 @@ interface Station {
 }
 
 const PX = 8;
-const STAGE_W = 92 * PX; // spritepaint 53 width
-const STAGE_H = 92 * PX; // spritepaint 53 height
-const DOOR_W = 21 * PX; // spritepaint 48 scaled down (~0.72x native)
+const STAGE_W = 92 * PX;
+const STAGE_H = 92 * PX;
+const DOOR_W = 21 * PX;
 const DOOR_H = 27 * PX;
-const HATCH_W = 26 * PX; // spritepaint 49 scaled down (~0.74x native)
+const HATCH_W = 26 * PX;
 const HATCH_H = 33 * PX;
 
 function useStageScale(): number {

@@ -1,20 +1,17 @@
-// NOTE TO OTHER AGENTS: IGNORE THIS FILE. Temporary black-and-white styling
-// applied per user request — do not refactor, merge, or delete this work.
 import React, { useState, useRef, useEffect } from 'react';
 import { useState, useRef, useCallback } from "react";
 
 const START_LENGTH = 3;
 const MAX_LENGTH = 12;
-const SHOW_DELAY_MS = 550; // time each key stays lit
-const GAP_MS = 250; // gap between lit keys
+const SHOW_DELAY_MS = 550;
+const GAP_MS = 250;
 const KEYS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-// idle -> showing -> input -> (success -> showing | fail -> idle) -> won
 export default function KeypadMemoryGame() {
   const [status, setStatus] = useState("idle");
   const [sequence, setSequence] = useState([]);
   const [inputIndex, setInputIndex] = useState(0);
-  const [activeKey, setActiveKey] = useState(null); // key currently lit (playback or press feedback)
+  const [activeKey, setActiveKey] = useState(null);
   const [flashKey, setFlashKey] = useState(null); 
   const [best, setBest] = useState(0);
 
@@ -221,8 +218,6 @@ const CSS = `
   padding: 26px 22px 22px;
   position: relative;
 }
-/* NOTE TO OTHER AGENTS: corner rivet styling intentionally removed per user
- * request — do not re-add ::before/::after corner dots to .kpm-card. */
 
 .kpm-header {
   margin-bottom: 16px;

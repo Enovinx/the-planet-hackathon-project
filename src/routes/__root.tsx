@@ -61,11 +61,6 @@ function RootComponent() {
   )
 }
 
-/**
- * Everything below the document shell. Keyed by `gameRunId` so a restart
- * remounts the active route and the meter, wiping every piece of game state
- * (intro, puzzle progress, overlays, timers) for a clean new run.
- */
 function GameRoot() {
   const navigate = useNavigate()
   const [gameRunId, setGameRunId] = React.useState(0)

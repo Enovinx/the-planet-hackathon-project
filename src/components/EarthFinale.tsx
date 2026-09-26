@@ -20,16 +20,17 @@ export default function EarthFinale({
   }, []);
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-black font-mono text-white">
+    <div className="fixed inset-0 z-[90] flex flex-col items-center justify-center overflow-hidden bg-black font-mono text-white">
       {hasArt ? (
         <img
           src={EARTH_SHIP_SRC}
           alt="Earth and the escape ship"
-          className="absolute inset-0 h-full w-full object-contain"
+          className="absolute inset-0"
           style={{
             imageRendering: 'pixelated',
             width: '100%',
             height: '100%',
+            objectFit: 'cover',
           }}
         />
       ) : (

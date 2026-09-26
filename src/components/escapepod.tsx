@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { playSfx } from '~/lib/sfx';
 
-export type GameState = 'START' | 'PLAYING' | 'GAME_OVER' | 'WIN';
+export type GameState = 'STORY' | 'START' | 'PLAYING' | 'GAME_OVER' | 'WIN';
 
 export type DeathReason = 'breach' | 'dense';
 
@@ -47,7 +47,7 @@ const ASTEROID_SRC = '/assets/spritepaint 43.png';
 
 export default function EscapePod({ onWin }: EscapePodProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [gameState, setGameState] = useState<GameState>('START');
+  const [gameState, setGameState] = useState<GameState>('STORY');
   const [timeLeft, setTimeLeft] = useState<number>(20);
   const [kills, setKills] = useState<number>(0);
   const [deathReason, setDeathReason] = useState<DeathReason>('breach');
@@ -332,6 +332,29 @@ export default function EscapePod({ onWin }: EscapePodProps) {
         {/* Game Over / Start Screens Overlay */}
         {gameState !== 'PLAYING' && (
           <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-10 p-8 text-center">
+            {gameState === 'STORY' && (
+              <>
+                <h1 className="text-3xl text-zinc-100 font-bold mb-4">T-MINUS 21</h1>
+                <p className="mb-2 text-lg font-bold text-zinc-400 max-w-md">
+                  Power restored. The Aegis is breaking apart behind you.
+                </p>
+                <p className="mb-6 text-lg font-bold text-zinc-400 max-w-md">
+                  One pod. One debris field. Punch through it and reach the rescue fleet.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setKills(0);
+                    setDeathReason('breach');
+                    setTimeLeft(20);
+                    setGameState('START');
+                  }}
+                  className="pixel-btn px-6 py-3 font-bold text-xl text-black"
+                >
+                  BOARD POD
+                </button>
+              </>
+            )}
             {gameState === 'START' && (
               <>
                 <h1 className="text-3xl text-yellow-500 font-bold mb-4">RADIATION DEBRIS FIELD</h1>

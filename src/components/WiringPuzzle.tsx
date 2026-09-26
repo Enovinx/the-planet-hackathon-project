@@ -58,10 +58,14 @@ function linkPair(active: Terminal, other: Terminal) {
   return { leftIndex, rightIndex };
 }
 
+const ROUND_SIZES = [4, 5];
+const FINAL_ROUND = ROUND_SIZES.length - 1;
+
 export default function WiringPuzzle({ seed, onSolved }: Props) {
   const [puzzle, setPuzzle] = React.useState<WiringPuzzle>(() =>
-    generateWiring(seed),
+    generateWiring(seed, ROUND_SIZES[0] ?? 4),
   );
+  const [round, setRound] = React.useState<number>(0);
   const [links, setLinks] = React.useState<Record<number, number>>({});
   const [active, setActive] = React.useState<Terminal | null>(null);
   const [pointer, setPointer] = React.useState<{ x: number; y: number } | null>(
@@ -74,7 +78,8 @@ export default function WiringPuzzle({ seed, onSolved }: Props) {
   const rejectTimer = React.useRef<number | undefined>(undefined);
 
   React.useEffect(() => {
-    setPuzzle(generateWiring(seed));
+    setPuzzle(generateWiring(seed, ROUND_SIZES[0] ?? 4));
+    setRound(0);
     setLinks({});
     setActive(null);
     setSolved(false);
@@ -82,11 +87,21 @@ export default function WiringPuzzle({ seed, onSolved }: Props) {
 
   React.useEffect(() => {
     if (!solved && isWiringSolved(links, puzzle)) {
+      if (round < FINAL_ROUND) {
+        // Grid cleared: rerack a fuller board before calling it done.
+        const next = round + 1;
+        setRound(next);
+        setPuzzle(generateWiring(undefined, ROUND_SIZES[next] ?? 5));
+        setLinks({});
+        setActive(null);
+        setHover(null);
+        return;
+      }
       setSolved(true);
       setActive(null);
       window.setTimeout(() => onSolved?.(), SOLVED_HOLD_MS);
     }
-  }, [links, puzzle, solved, onSolved]);
+  }, [links, puzzle, solved, onSolved, round]);
 
   React.useEffect(
     () => () => {
@@ -260,7 +275,7 @@ export default function WiringPuzzle({ seed, onSolved }: Props) {
     <div className="w-full max-w-xl select-none">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="font-mono text-base font-bold uppercase tracking-[0.3em] text-zinc-100">
-          Wiring Panel
+          Wiring {round + 1}/{ROUND_SIZES.length}
         </h2>
         <div className="flex items-center gap-3">
           <button

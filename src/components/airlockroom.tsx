@@ -57,6 +57,7 @@ export default function AirlockRoom() {
   const [activeOverlay, setActiveOverlay] = useState<OverlayType>(null);
   const [progress, setProgress] = useState<Progress>(EMPTY_PROGRESS);
   const [notice, setNotice] = useState<string | null>(null);
+  const [escaped, setEscaped] = useState<boolean>(false);
 
   const complete = useCallback((flag: keyof Progress) => {
     setProgress((prev) => ({ ...prev, [flag]: true }));
@@ -254,10 +255,45 @@ export default function AirlockRoom() {
             <EscapePod
               onWin={() => {
                 setActiveOverlay(null);
-                setNotice('Escape pod launched. You made it off the planet.');
+                setEscaped(true);
               }}
             />
           )}
+        </div>
+      )}
+
+      {escaped && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black p-6">
+          <div className="flex w-full max-w-md flex-col items-center gap-5 border-2 border-emerald-400 bg-zinc-950 px-8 py-10 text-center shadow-[10px_10px_0px_rgba(52,211,153,1)]">
+            <img
+              src="/assets/ship/Main%20Ship%20-%20Base%20-%20Full%20health.png"
+              alt="Restored ship"
+              draggable={false}
+              className="w-3/4 select-none"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            <p className="font-mono text-[11px] uppercase tracking-[0.35em] text-emerald-400">
+              Signal reached
+            </p>
+            <h2 className="font-mono text-3xl font-bold uppercase tracking-widest text-zinc-100">
+              Escaped
+            </h2>
+            <p className="font-mono text-sm leading-relaxed text-zinc-400">
+              Escape pod launched. You cleared the debris field and made it
+              off the planet. The rescue fleet has your signal.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setProgress(EMPTY_PROGRESS);
+                setEscaped(false);
+                setNotice(null);
+              }}
+              className="mt-2 border-2 border-emerald-400 bg-emerald-400 px-6 py-3 font-mono text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-emerald-300"
+            >
+              Play again
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -207,7 +207,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
             {gameState === 'START' && (
               <>
                 <h1 className="text-3xl text-yellow-500 font-bold mb-4">RADIATION DEBRIS FIELD</h1>
-                <p className="mb-6 text-zinc-400">Use LEFT/RIGHT arrows to move. SPACE to fire lasers.</p>
+                <p className="mb-6 text-lg font-bold text-zinc-100">Use LEFT/RIGHT arrows to move. SPACE to fire lasers.</p>
                 <button
                   type="button"
                   onClick={() => setGameState('PLAYING')}

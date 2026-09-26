@@ -65,7 +65,7 @@ export default function AirlockRoom() {
   const openStation = useCallback(
     (station: Station) => {
       if (!station.unlocked) {
-        setNotice(`${station.label} — no power. Bring the ship back online first.`);
+        setNotice(`${station.label}: no power. Bring the ship back online first.`);
         window.setTimeout(() => setNotice(null), 2200);
         return;
       }
@@ -178,7 +178,7 @@ export default function AirlockRoom() {
             }`}
           >
             <span
-              className={`pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-sm border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] transition-opacity duration-150 ${
+              className={`pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-sm border px-2 py-1 font-mono text-sm uppercase tracking-[0.2em] transition-opacity duration-150 ${
                 station.unlocked
                   ? 'border-yellow-400/40 bg-black/85 text-yellow-300 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
                   : 'border-zinc-600/40 bg-black/85 text-zinc-500 opacity-0 group-hover:opacity-100'
@@ -193,7 +193,7 @@ export default function AirlockRoom() {
           <div
             role="status"
             aria-live="polite"
-            className="pointer-events-none absolute bottom-[3%] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-yellow-400/40 bg-black/85 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-yellow-300"
+            className="pointer-events-none absolute bottom-[3%] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-yellow-400/40 bg-black/85 px-4 py-1.5 font-mono text-sm uppercase tracking-[0.2em] text-yellow-300"
           >
             {notice}
           </div>

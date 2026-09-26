@@ -59,15 +59,12 @@ export default function OxygenMeter() {
           }`}
         >
           <div className="flex items-center justify-between gap-6">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-500">
-              O2
-            </span>
             <span
-              className={`text-lg font-bold tabular-nums ${valueTone} ${
+              className={`text-lg font-bold uppercase tabular-nums ${valueTone} ${
                 low ? 'animate-pulse' : ''
               }`}
             >
-              {formatPercent(remaining)}
+              O2 {formatPercent(remaining)}
             </span>
           </div>
           <div className="mt-2 h-1.5 w-40 bg-zinc-800">
@@ -83,19 +80,13 @@ export default function OxygenMeter() {
 
       {dead && (
         <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center gap-4 bg-black px-6 text-center font-mono text-white">
-          <p className="text-xs uppercase tracking-[0.5em] text-red-500">
-            Life Support Failure
-          </p>
           <h1 className="text-4xl font-bold uppercase tracking-widest text-red-500 sm:text-7xl">
             Oxygen Depleted
           </h1>
-          <p className="text-sm uppercase tracking-[0.35em] text-zinc-500">
-            You died
-          </p>
           <button
             type="button"
             onClick={restart}
-            className="mt-6 border-2 border-red-500/60 px-6 py-2 text-xs uppercase tracking-[0.35em] text-red-300 transition-colors hover:border-red-400 hover:text-red-200"
+            className="mt-6 border-2 border-red-500/60 px-8 py-3 text-base font-bold uppercase tracking-[0.35em] text-red-300 transition-colors hover:border-red-400 hover:text-red-200"
           >
             Try Again
           </button>

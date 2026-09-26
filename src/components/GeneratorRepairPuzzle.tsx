@@ -237,7 +237,7 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
       if ((paths[d] ?? []).some((p) => samePos(p, cell))) return;
     }
 
-    // Reaching the twin snaps the link locked — no overshoot possible.
+    // Reaching the twin snaps the link locked, no overshoot possible.
     const twin = twinOf(puzzle, color, current);
     if (twin && samePos(cell, twin)) {
       const finished = [...current.map((p) => ({ ...p })), { ...cell }];

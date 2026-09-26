@@ -2,9 +2,9 @@ import * as React from 'react';
 
 
 const LINES: string[] = [
-  'CRYO POD 07 — THAW COMPLETE',
+  'CRYO POD 07: THAW COMPLETE',
   'LIFE SUPPORT: CRITICAL',
-  'LAST CONTACT — 47 DAYS AGO',
+  'LAST CONTACT: 47 DAYS AGO',
   'YOU ARE DRIFTING',
   'A LOST ASTRONAUT',
   'SOMEWHERE OUT THERE…',
@@ -72,23 +72,13 @@ export default function Intro({ onComplete }: IntroProps) {
             key={lineIndex}
             role="status"
             aria-live="polite"
-            className="intro-line text-center font-mono text-xs sm:text-sm uppercase tracking-[0.35em] text-zinc-300"
+            className="intro-line text-center font-mono text-base sm:text-xl uppercase tracking-[0.35em] text-zinc-100"
           >
             {LINES[lineIndex]}
           </p>
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          complete();
-        }}
-        className="absolute bottom-6 right-6 font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-600 transition-colors hover:text-zinc-300"
-      >
-        Skip
-      </button>
     </div>
   );
 }

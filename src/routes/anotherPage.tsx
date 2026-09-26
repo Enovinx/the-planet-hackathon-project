@@ -33,7 +33,7 @@ function AnotherPage() {
               void callMyAction({
                 first: Math.round(Math.random() * 100),
               }).then(() => {
-                setActionMessage('Action completed — number added!')
+                setActionMessage('Action completed: number added!')
               })
             }}
           >

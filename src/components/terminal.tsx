@@ -115,7 +115,7 @@ export default function Terminal({ systemIntegrity = 100, onCrash }: TerminalPro
             value={input}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
             disabled={isTyping}
-            className="flex-1 bg-transparent border-none outline-none text-red-400 text-xl uppercase placeholder-red-900 disabled:opacity-50"
+            className="flex-1 bg-transparent border-none outline-none text-red-400 text-xl uppercase placeholder-red-700 disabled:opacity-50"
             placeholder={isTyping ? "SYS IS PROCESSING..." : "ENTER COMMAND..."}
             autoComplete="off"
             autoFocus

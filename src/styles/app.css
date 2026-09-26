@@ -257,3 +257,20 @@
     animation: none;
   }
 }
+
+/* Wiring panel: current crawling along completed cables. */
+@keyframes wire-flow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+.wire-flow {
+  animation: wire-flow 0.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wire-flow {
+    animation: none;
+  }
+}

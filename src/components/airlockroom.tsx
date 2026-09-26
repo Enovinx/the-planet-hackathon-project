@@ -3,6 +3,7 @@ import KeypadMemoryGame from './memgame';
 import Terminal from './terminal';
 import EscapePod from './escapepod';
 import GeneratorRepairPuzzle from './GeneratorRepairPuzzle';
+import WiringPuzzle from './WiringPuzzle';
 
 type OverlayType =
   | 'keypad'
@@ -138,7 +139,7 @@ export default function AirlockRoom() {
         {/* Ship status schematic sitting in the dark wedge under the viewport. */}
         <div
           className="pointer-events-none absolute flex flex-col items-center"
-          style={{ left: '44%', top: '59%', width: '12%' }}
+          style={{ left: '40%', top: '50%', width: '20%' }}
         >
           <img
             src={HULL_STATES[completedSteps]}
@@ -247,18 +248,7 @@ export default function AirlockRoom() {
 
           {activeOverlay === 'wiring' && (
             <div className="flex min-h-full items-center justify-center p-6">
-              <div className="text-center text-white">
-                <h2 className="mb-4 text-2xl text-yellow-500">
-                  ENOVINX WIRING GAME GOES HERE
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => complete('powerRestored')}
-                  className="bg-red-600 p-4 font-bold text-black transition-colors hover:bg-red-500"
-                >
-                  [DEV SKIP: WIN WIRING]
-                </button>
-              </div>
+              <WiringPuzzle onSolved={() => complete('powerRestored')} />
             </div>
           )}
 

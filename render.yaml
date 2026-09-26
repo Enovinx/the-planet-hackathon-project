@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: the-planet-hackathon
+    runtime: node
+    plan: free
+    buildCommand: pnpm install && pnpm run build
+    startCommand: node dist/server/server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PNPM_VERSION
+        value: 10.33.2

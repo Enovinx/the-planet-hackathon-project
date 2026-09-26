@@ -3,6 +3,10 @@ import { playSfx } from '~/lib/sfx';
 
 export type GameState = 'START' | 'PLAYING' | 'GAME_OVER' | 'WIN';
 
+export type DeathReason = 'breach' | 'dense';
+
+const KILL_QUOTA = 8;
+
 interface EscapePodProps {
   onWin?: () => void;
 }
@@ -45,6 +49,8 @@ export default function EscapePod({ onWin }: EscapePodProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>('START');
   const [timeLeft, setTimeLeft] = useState<number>(20);
+  const [kills, setKills] = useState<number>(0);
+  const [deathReason, setDeathReason] = useState<DeathReason>('breach');
   const spritesRef = useRef<{ rocket?: HTMLImageElement; asteroid?: HTMLImageElement }>({});
 
   useEffect(() => {
@@ -246,6 +252,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
             burst(ast.x + 15, ast.y + 15, '#ffffff', 5, 2);
             shake = 6;
             playSfx('explode');
+            setKills((k) => k + 1);
             break;
           }
         }
@@ -285,14 +292,19 @@ export default function EscapePod({ onWin }: EscapePodProps) {
   useEffect(() => {
     if (gameState !== 'PLAYING') return;
     if (timeLeft <= 0) {
-      setGameState('WIN');
-      playSfx('win');
-      const winTimer = setTimeout(() => onWinRef.current?.(), 1200);
-      return () => clearTimeout(winTimer);
+      if (kills >= KILL_QUOTA) {
+        setGameState('WIN');
+        playSfx('win');
+      } else {
+        setDeathReason('dense');
+        setGameState('GAME_OVER');
+        playSfx('explode');
+      }
+      return;
     }
     const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     return () => clearInterval(timer);
-  }, [gameState, timeLeft]);
+  }, [gameState, timeLeft, kills]);
 
   const onWinRef = useRef(onWin);
   onWinRef.current = onWin;
@@ -307,6 +319,9 @@ export default function EscapePod({ onWin }: EscapePodProps) {
     <div className="min-h-screen bg-black flex flex-col items-center justify-center font-mono text-white selection:bg-none">
       <div className="w-full max-w-[600px] flex justify-between items-center mb-4 border-b-4 border-zinc-700 pb-2">
         <h2 className="text-2xl font-bold text-yellow-500 uppercase tracking-widest">Pod Navigation</h2>
+        <div className="text-lg font-bold text-zinc-100">
+          KILLS: {kills}/{KILL_QUOTA}
+        </div>
         <div className={`text-2xl font-bold ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-green-500'}`}>
           T-MINUS: {timeLeft}s
         </div>
@@ -320,10 +335,15 @@ export default function EscapePod({ onWin }: EscapePodProps) {
             {gameState === 'START' && (
               <>
                 <h1 className="text-3xl text-yellow-500 font-bold mb-4">RADIATION DEBRIS FIELD</h1>
-                <p className="mb-6 text-lg font-bold text-zinc-100">Use LEFT/RIGHT arrows to move. SPACE to fire lasers.</p>
+                <p className="mb-6 text-lg font-bold text-zinc-100">Destroy {KILL_QUOTA} asteroids to clear the field. Arrows to move. SPACE to fire.</p>
                 <button
                   type="button"
-                  onClick={() => setGameState('PLAYING')}
+                  onClick={() => {
+                    setKills(0);
+                    setDeathReason('breach');
+                    setTimeLeft(20);
+                    setGameState('PLAYING');
+                  }}
                   className="pixel-btn px-6 py-3 font-bold text-xl text-black"
                 >
                   INITIATE LAUNCH
@@ -332,12 +352,21 @@ export default function EscapePod({ onWin }: EscapePodProps) {
             )}
             {gameState === 'GAME_OVER' && (
               <>
-                <h1 className="text-4xl text-red-600 font-bold mb-4">HULL BREACH</h1>
+                <h1 className="text-4xl text-red-600 font-bold mb-4">
+                  {deathReason === 'dense' ? 'FIELD TOO DENSE' : 'HULL BREACH'}
+                </h1>
+                <p className="mb-4 text-lg font-bold text-zinc-100">
+                  {deathReason === 'dense'
+                    ? `Only ${kills}/${KILL_QUOTA} destroyed. Shoot the rocks.`
+                    : 'Your pod was hit.'}
+                </p>
                 <button
                   type="button"
                   onClick={() => {
                     setGameState('START');
                     setTimeLeft(20);
+                    setKills(0);
+                    setDeathReason('breach');
                   }}
                   className="pixel-btn px-6 py-3 font-bold text-xl text-black"
                 >

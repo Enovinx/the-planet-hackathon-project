@@ -21,10 +21,8 @@ interface ChatEntry {
 /** Which brain answered the last turn: the live model or the ship-side core. */
 type Engine = 'live' | 'local';
 
-const FALLBACK_API_KEY = 'AQ.Ab8RN6J5GTtamxcbckkHdcsX1ZnKoGkC1QGu4DlQ_0IsWcFBZw';
 const API_KEY =
-  ((import.meta.env.VITE_GEMINI_API_KEY as string | undefined) ?? '') ||
-  FALLBACK_API_KEY;
+  ((import.meta.env.VITE_GEMINI_API_KEY as string | undefined) ?? '');
 const MODEL_NAME =
   (import.meta.env.VITE_GEMINI_MODEL as string | undefined) ??
   'gemini-3.5-flash-lite';

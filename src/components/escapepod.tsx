@@ -44,7 +44,7 @@ const ASTEROID_SRC = '/assets/spritepaint 43.png';
 export default function EscapePod({ onWin }: EscapePodProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>('START');
-  const [timeLeft, setTimeLeft] = useState<number>(20);
+  const [timeLeft, setTimeLeft] = useState<number>(3); // TEMP-TEST: revert to 20
   const spritesRef = useRef<{ rocket?: HTMLImageElement; asteroid?: HTMLImageElement }>({});
 
   useEffect(() => {
@@ -174,10 +174,6 @@ export default function EscapePod({ onWin }: EscapePodProps) {
       if (keys.ArrowLeft && player.x > 0) player.x -= player.speed;
       if (keys.ArrowRight && player.x + player.width < canvas.width) player.x += player.speed;
 
-      if ((keys.ArrowLeft || keys.ArrowRight) && frameCount % 3 === 0) {
-        burst(player.x + 15, player.y + 30, '#00ccff', 1, 1.5);
-      }
-
       const rocket = spritesRef.current.rocket;
       if (rocket && rocket.complete && rocket.naturalWidth > 0) {
         ctx.drawImage(rocket, player.x + 15 - 55 / 2, player.y + 30 - 74, 55, 74);
@@ -191,13 +187,13 @@ export default function EscapePod({ onWin }: EscapePodProps) {
         ctx.fill();
       }
 
-      if (frameCount % 30 === 0) {
+      if (frameCount % 45 === 0) {
         asteroids.push({
           x: Math.random() * (canvas.width - 30),
           y: -30,
           width: 30,
           height: 30,
-          speed: 2 + Math.random() * 3,
+          speed: 1.5 + Math.random() * 2,
         });
       }
 
@@ -296,7 +292,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
       playSfx('win');
       const winTimer = setTimeout(() => {
         onWin?.();
-      }, 3000);
+      }, 1200);
       return () => clearTimeout(winTimer);
     }
 

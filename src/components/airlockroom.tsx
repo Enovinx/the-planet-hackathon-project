@@ -4,7 +4,7 @@ import Terminal from './terminal';
 import EscapePod from './escapepod';
 import GeneratorRepairPuzzle from './GeneratorRepairPuzzle';
 import WiringPuzzle from './WiringPuzzle';
-import VictoryScreen from './VictoryScreen';
+import EarthFinale from './EarthFinale';
 
 type OverlayType =
   | 'keypad'
@@ -30,8 +30,12 @@ interface Station {
 }
 
 const PX = 8;
-const STAGE_W = 73 * PX;
-const STAGE_H = 79 * PX;
+const STAGE_W = 92 * PX; // spritepaint 53 width
+const STAGE_H = 92 * PX; // spritepaint 53 height
+const DOOR_W = 21 * PX; // spritepaint 48 scaled down (~0.72x native)
+const DOOR_H = 27 * PX;
+const HATCH_W = 26 * PX; // spritepaint 49 scaled down (~0.74x native)
+const HATCH_H = 33 * PX;
 
 function useStageScale(): number {
   const [scale, setScale] = useState(1);
@@ -136,6 +140,16 @@ export default function AirlockRoom() {
   const completedSteps = STEP_ORDER.filter((flag) => progress[flag]).length;
   const stageScale = useStageScale();
 
+  // The first unfinished stage is the active door the player must enter.
+  const FLAG_TO_DOOR: Record<(typeof STEP_ORDER)[number], OverlayType> = {
+    powerKeys: 'keypad',
+    sysCrashed: 'terminal',
+    coreFixed: 'generator',
+    powerRestored: 'wiring',
+  };
+  const nextFlag = STEP_ORDER.find((flag) => !progress[flag]);
+  const activeDoorId = nextFlag ? FLAG_TO_DOOR[nextFlag] : null;
+
   // Judge failsafes: always clickable above overlays. SKIP advances one
   // stage, RESET restarts the whole run for the next demo.
   const skipStage = useCallback(() => {
@@ -183,70 +197,84 @@ export default function AirlockRoom() {
           style={{ width: STAGE_W, height: STAGE_H, transform: `scale(${stageScale})` }}
         >
           <img
-            src="/assets/spritepaint 44.png"
+            src="/assets/spritepaint 53.png"
             alt="Ship interior"
             draggable={false}
             className="absolute inset-0 select-none"
             style={{ imageRendering: 'pixelated', width: STAGE_W, height: STAGE_H }}
           />
 
-          {/* Ship status schematic on the floor, left side. */}
-          <div
-            className="pointer-events-none absolute flex flex-col items-center"
-            style={{ left: '4%', top: '72%', width: '17%' }}
-          >
-            <img
-              src={HULL_STATES[completedSteps]}
-              alt=""
-              className="w-full"
-              style={{ imageRendering: 'pixelated' }}
-            />
-            <div className="mt-1.5 flex gap-1.5">
-              {STEP_ORDER.map((flag, index) => (
-                <span
-                  key={flag}
-                  className="block h-2 w-2 rounded-full border border-black/60"
-                  style={{
-                    background: progress[flag]
-                      ? '#4ade80'
-                      : index === completedSteps
-                        ? '#eab308'
-                        : '#27272a',
-                  }}
+          {/* Row of challenge doors along the back wall. The active door is
+              highlighted, done doors show a green check, locked doors are
+              greyed out and cannot be entered. */}
+          {[
+            { id: 'keypad', label: 'Access Codes', left: '8%' },
+            { id: 'terminal', label: 'SYS Terminal', left: '30%' },
+            { id: 'generator', label: 'Power Core', left: '52%' },
+            { id: 'wiring', label: 'Wiring', left: '74%' },
+          ].map(({ id, label, left }) => {
+            const station = stations.find((s) => s.id === id);
+            if (!station) return null;
+            const isActive =
+              station.unlocked && !station.done && id === activeDoorId;
+            const isDone = station.done;
+            const isLocked = !station.unlocked;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => openStation(station)}
+                disabled={isLocked}
+                aria-label={`${station.label} door`}
+                title={`${station.label}${isDone ? ' ✓' : isLocked ? ' (no power)' : ''}`}
+                className={`group absolute transition-all duration-200 ${
+                  isActive
+                    ? 'z-10 drop-shadow-[0_0_18px_rgba(250,204,21,0.65)]'
+                    : ''
+                } ${isLocked ? 'cursor-not-allowed brightness-[0.45] saturate-50' : 'cursor-pointer'}`}
+                style={{ left, top: '14%', width: DOOR_W, height: DOOR_H }}
+              >
+                <img
+                  src={isActive ? '/assets/spritepaint 49.png' : '/assets/spritepaint 48.png'}
+                  alt=""
+                  draggable={false}
+                  className="h-full w-full select-none"
+                  style={{ imageRendering: 'pixelated' }}
                 />
-              ))}
-            </div>
-          </div>
+                {isDone && (
+                  <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[11px] font-bold text-black">
+                    ✓
+                  </span>
+                )}
+                <span
+                  className={`pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-sm border px-2 py-1 font-mono text-sm uppercase tracking-[0.2em] transition-opacity duration-150 ${
+                    isLocked
+                      ? 'border-zinc-600/40 bg-black/85 text-zinc-500 opacity-0 group-hover:opacity-100'
+                      : 'border-yellow-400/40 bg-black/85 text-yellow-300 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
+                  }`}
+                >
+                  {label}
+                </span>
+              </button>
+            );
+          })}
 
-          {/* Plain door (48): keypad station, native 435x570 at 15x. */}
-          <button
-            type="button"
-            onClick={() => openStation(stations[1])}
-            aria-label="Keypad door"
-            title="Keypad"
-            className="group absolute"
-            style={{ left: '7%', top: '16%', width: 29 * PX, height: 38 * PX }}
-          >
-            <img
-              src="/assets/spritepaint 48.png"
-              alt=""
-              draggable={false}
-              className="h-full w-full select-none"
-              style={{ imageRendering: 'pixelated' }}
-            />
-            {progress.powerKeys && (
-              <span className="absolute inset-0 border-4 border-emerald-400/80" />
-            )}
-          </button>
+          {/* Gold door (49) sprite reserved for the active door; escape is
+              reached from the escape pod station after power is restored. */}
 
-          {/* Gold door (49): escape pod hatch, native 525x660 at 15x. */}
+          {/* Escape pod hatch, bottom right on the floor. */}
           <button
             type="button"
             onClick={() => openStation(stations[4])}
+            disabled={!stations[4].unlocked}
             aria-label="Escape pod hatch"
-            title="Escape Pod"
-            className={`group absolute ${progress.powerRestored ? '' : 'brightness-[0.55]'}`}
-            style={{ left: '54%', top: '12%', width: 35 * PX, height: 44 * PX }}
+            title={`Escape Pod${stations[4].unlocked ? '' : ' (restore power first)'}`}
+            className={`group absolute ${
+              stations[4].unlocked
+                ? 'cursor-pointer drop-shadow-[0_0_18px_rgba(74,222,128,0.55)]'
+                : 'cursor-not-allowed brightness-[0.45] saturate-50'
+            }`}
+            style={{ left: '82%', top: '68%', width: HATCH_W, height: HATCH_H }}
           >
             <img
               src="/assets/spritepaint 49.png"
@@ -256,43 +284,6 @@ export default function AirlockRoom() {
               style={{ imageRendering: 'pixelated' }}
             />
           </button>
-
-          {/* Wall/floor stations without dedicated sprites. */}
-          {[
-            { id: 0, left: '30%', top: '20%', width: '12%', height: '20%' },
-            { id: 2, left: '34%', top: '74%', width: '18%', height: '16%' },
-            { id: 3, left: '90%', top: '22%', width: '7%', height: '24%' },
-          ].map(({ id, left, top, width, height }) => {
-            const station = stations[id];
-            return (
-              <button
-                key={station.id}
-                type="button"
-                onClick={() => openStation(station)}
-                disabled={!station.unlocked}
-                aria-label={station.label}
-                title={station.label}
-                style={{ left, top, width, height }}
-                className={`group absolute rounded-sm border-2 transition-colors duration-200 focus:outline-none ${
-                  station.done
-                    ? 'border-emerald-400/70 bg-emerald-400/5'
-                    : station.unlocked
-                      ? 'station-ready cursor-pointer border-yellow-400/60 bg-yellow-400/5 hover:bg-yellow-400/25'
-                      : 'cursor-not-allowed border-zinc-500/20 bg-black/25'
-                }`}
-              >
-                <span
-                  className={`pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-sm border px-2 py-1 font-mono text-sm uppercase tracking-[0.2em] transition-opacity duration-150 ${
-                    station.unlocked
-                      ? 'border-yellow-400/40 bg-black/85 text-yellow-300 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
-                      : 'border-zinc-600/40 bg-black/85 text-zinc-500 opacity-0 group-hover:opacity-100'
-                  }`}
-                >
-                  {station.done ? `${station.label} ✓` : station.label}
-                </span>
-              </button>
-            );
-          })}
 
           {notice && (
             <div
@@ -307,7 +298,7 @@ export default function AirlockRoom() {
       </div>
 
       {activeOverlay && (
-        <div className="fixed inset-0 z-50 overflow-auto bg-black/92">
+        <div className="fixed inset-0 z-50 overflow-auto bg-black/60 backdrop-blur-sm">
           <button
             type="button"
             onClick={() => setActiveOverlay(null)}
@@ -376,7 +367,7 @@ export default function AirlockRoom() {
       )}
 
       {escaped && (
-        <VictoryScreen
+        <EarthFinale
           durationMs={finalDurationMs}
           skipped={skipCount}
           onRestart={resetDemo}

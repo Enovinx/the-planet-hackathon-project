@@ -21,4 +21,5 @@ Use pnpm instead of npm for all commands, this project uses the pnpm package man
 Be carefull not to use commands that will not return, as this will block your session and I will have to intervene (which is annoying for me and wastes a lot of my time)
 
 When you start work, let me know if you are on main, so I can create a worktree/branch before you make unintentional changes on main, this is needed because I am working with a team.
+
 When you start work and branch from main, check git status to make sure we are up to date with remote and pull and merge if needed.

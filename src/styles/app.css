@@ -252,7 +252,6 @@
   }
 }
 
-/* Wiring panel: current crawling along completed cables. */
 @keyframes wire-flow {
   to {
     stroke-dashoffset: -12;

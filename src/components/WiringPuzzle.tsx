@@ -19,7 +19,6 @@ interface Terminal {
   index: number;
 }
 
-/** Terminal column positions, in the SVG's 0..100 coordinate space. */
 const LEFT_X = 8;
 const RIGHT_X = 92;
 const SOLVED_HOLD_MS = 1100;
@@ -43,7 +42,6 @@ function terminalPosition(terminal: Terminal, size: number) {
   };
 }
 
-/** A sagging patch-cable curve between two terminals. */
 function wirePath(x1: number, y1: number, x2: number, y2: number): string {
   const bow = 26;
   return `M ${x1} ${y1} C ${x1 + bow} ${y1}, ${x2 - bow} ${y2}, ${x2} ${y2}`;

@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback } from "react";
 
 const START_LENGTH = 3;
-const MAX_LENGTH = 12;
+// Climb from 3 up to 6 and you're through — no long haul to 12.
+const MAX_LENGTH = 6;
 const SHOW_DELAY_MS = 550; // time each key stays lit
 const GAP_MS = 250; // gap between lit keys
 const KEYS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;

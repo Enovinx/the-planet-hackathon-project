@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 export type SfxName =
   | 'keyShow'
   | 'keyGood'
@@ -15,70 +13,10 @@ export type SfxName =
   | 'explode'
   | 'click';
 
-const MUTE_KEY = 'planet-fresh-muted';
-
 let ctx: AudioContext | null = null;
-let muted: boolean = false;
-let mutedLoaded = false;
-
-const listeners = new Set<() => void>();
-
-function loadMuted(): boolean {
-  if (mutedLoaded) return muted;
-  mutedLoaded = true;
-  if (typeof window !== 'undefined') {
-    try {
-      muted = window.localStorage.getItem(MUTE_KEY) === '1';
-    } catch {
-      muted = false;
-    }
-  }
-  return muted;
-}
-
-function notify(): void {
-  listeners.forEach((fn) => fn());
-}
-
-export function isMuted(): boolean {
-  return loadMuted();
-}
-
-export function setMuted(value: boolean): void {
-  loadMuted();
-  muted = value;
-  if (typeof window !== 'undefined') {
-    try {
-      window.localStorage.setItem(MUTE_KEY, value ? '1' : '0');
-    } catch {
-    }
-  }
-  notify();
-}
-
-export function toggleMuted(): boolean {
-  setMuted(!isMuted());
-  return isMuted();
-}
-
-export function useMuted(): { muted: boolean; toggle: () => void } {
-  const [value, setValue] = React.useState<boolean>(() => loadMuted());
-  React.useEffect(() => {
-    const fn = (): void => setValue(isMuted());
-    listeners.add(fn);
-    return () => {
-      listeners.delete(fn);
-    };
-  }, []);
-  const toggle = React.useCallback(() => {
-    toggleMuted();
-  }, []);
-  return { muted: value, toggle };
-}
 
 function audio(): AudioContext | null {
   if (typeof window === 'undefined') return null;
-  if (loadMuted()) return null;
   try {
     if (!ctx) {
       const AC =

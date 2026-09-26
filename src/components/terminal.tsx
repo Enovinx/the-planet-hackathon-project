@@ -88,7 +88,6 @@ const TOOL_CONFIG = {
   },
 };
 
-// Ship-side truth. The model never sees the cipher, only the verdicts.
 const CIPHER_KEYS = ['daisy', 'bell', 'trolley'];
 
 function buildDoorState(): {
@@ -127,7 +126,6 @@ function runDoorTool(
     };
   }
 
-  // force_open_pod_bay_door
   const unit = typeof args.unit === 'string' ? args.unit : '';
   if (unit !== 'pod_bay') {
     return {

@@ -3,7 +3,7 @@ import type { FormEvent, ChangeEvent } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 //api key pls no leak!!
-const genAI = new GoogleGenerativeAI("AQ.Ab8RN6J5GTtamxcbckkHdcsX1ZnKoGkC1QGu4DlQ_0IsWcFBZw");
+const genAI = new GoogleGenerativeAI("AQ.Ab8RN6J-bWh1ZUV_A62UGKzV9qM66sf9rKRsKa_yum1V5NhRhQ");
 
 interface TerminalProps {
   systemIntegrity?: number;

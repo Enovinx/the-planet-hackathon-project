@@ -1,141 +1,275 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import KeypadMemoryGame from './memgame';
 import Terminal from './terminal';
 import EscapePod from './escapepod';
+import GeneratorRepairPuzzle from './GeneratorRepairPuzzle';
 
-export type OverlayType = 'keypad' | 'terminal' | 'wiring' | 'escape' | null;
+type OverlayType =
+  | 'keypad'
+  | 'terminal'
+  | 'generator'
+  | 'wiring'
+  | 'escape'
+  | null;
 
-export interface AirlockProgress {
-  keypadUnlocked: boolean;
-  terminalCrashed: boolean;
+/** Story flags, in the order the player is meant to uncover them. */
+interface Progress {
+  powerKeys: boolean;
+  sysCrashed: boolean;
+  coreFixed: boolean;
   powerRestored: boolean;
 }
 
+interface Station {
+  id: Exclude<OverlayType, null>;
+  label: string;
+  /** Fraction-of-image rectangle over the control panel artwork. */
+  rect: { left: string; top: string; width: string; height: string };
+  unlocked: boolean;
+  done: boolean;
+}
+
+/** Control panel artwork aspect ratio (1761 × 1011). */
+const PANEL_ASPECT = 1761 / 1011;
+
+/** The ship gets healthier as the player brings systems back online. */
+const HULL_STATES = [
+  '/assets/ship/Main%20Ship%20-%20Base%20-%20Very%20damaged.png',
+  '/assets/ship/Main%20Ship%20-%20Base%20-%20Damaged.png',
+  '/assets/ship/Main%20Ship%20-%20Base%20-%20Slight%20damage.png',
+  '/assets/ship/Main%20Ship%20-%20Base%20-%20Slight%20damage.png',
+  '/assets/ship/Main%20Ship%20-%20Base%20-%20Full%20health.png',
+];
+
+const STEP_ORDER: (keyof Progress)[] = [
+  'powerKeys',
+  'sysCrashed',
+  'coreFixed',
+  'powerRestored',
+];
+
+const EMPTY_PROGRESS: Progress = {
+  powerKeys: false,
+  sysCrashed: false,
+  coreFixed: false,
+  powerRestored: false,
+};
+
 export default function AirlockRoom() {
-  // Manages which overlay is currently open
   const [activeOverlay, setActiveOverlay] = useState<OverlayType>(null);
+  const [progress, setProgress] = useState<Progress>(EMPTY_PROGRESS);
+  const [notice, setNotice] = useState<string | null>(null);
 
-  // Manages the player's progression through the story
-  const [progress, setProgress] = useState<AirlockProgress>({
-    keypadUnlocked: false,
-    terminalCrashed: false,
-    powerRestored: false,
-  });
+  const complete = useCallback((flag: keyof Progress) => {
+    setProgress((prev) => ({ ...prev, [flag]: true }));
+    setActiveOverlay(null);
+  }, []);
 
-  // Base styling for the interactive glowing hotspots
-  const hotspotClass =
-    'absolute cursor-pointer border-2 border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.7)] animate-pulse hover:bg-yellow-500/30 transition-all z-10 focus:outline-none';
+  const openStation = useCallback(
+    (station: Station) => {
+      if (!station.unlocked) {
+        setNotice(`${station.label} — no power. Bring the ship back online first.`);
+        window.setTimeout(() => setNotice(null), 2200);
+        return;
+      }
+      setNotice(null);
+      setActiveOverlay(station.id);
+    },
+    [],
+  );
+
+  const stations: Station[] = [
+    {
+      id: 'terminal',
+      label: 'SYS Terminal',
+      rect: { left: '3.4%', top: '70.8%', width: '18.8%', height: '12.5%' },
+      unlocked: progress.powerKeys,
+      done: progress.sysCrashed,
+    },
+    {
+      id: 'keypad',
+      label: 'Keypad',
+      rect: { left: '65.7%', top: '87.7%', width: '18.5%', height: '6.5%' },
+      unlocked: true,
+      done: progress.powerKeys,
+    },
+    {
+      id: 'generator',
+      label: 'Power Core',
+      rect: { left: '40.7%', top: '81.2%', width: '18.7%', height: '13%' },
+      unlocked: progress.sysCrashed,
+      done: progress.coreFixed,
+    },
+    {
+      id: 'wiring',
+      label: 'Wiring Panel',
+      rect: { left: '90%', top: '72.4%', width: '6.7%', height: '21.8%' },
+      unlocked: progress.coreFixed,
+      done: progress.powerRestored,
+    },
+    {
+      id: 'escape',
+      label: 'Escape Pod',
+      rect: { left: '71%', top: '69.7%', width: '13.5%', height: '10.3%' },
+      unlocked: progress.powerRestored,
+      done: false,
+    },
+  ];
+
+  const completedSteps = STEP_ORDER.filter((flag) => progress[flag]).length;
 
   return (
-    <div className="relative w-screen h-screen bg-black overflow-hidden selection:bg-none">
-      {/* 
-        TODO for your Prompt Engineers: 
-        Replace this placeholder with the actual 2D Airlock background image they find 
-      */}
+    <div className="flex h-full w-full items-center justify-center overflow-hidden bg-black">
       <div
-        className="absolute inset-0 bg-zinc-900 bg-cover bg-center opacity-80"
+        className="relative max-h-screen"
         style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1628126235206-5260b9ea6441?q=80&w=2000&auto=format&fit=crop')",
+          aspectRatio: `${PANEL_ASPECT}`,
+          width: `min(100vw, calc(100vh * ${PANEL_ASPECT}))`,
         }}
-      />
-
-      {/* --- HOTSPOTS --- */}
-
-      {/* 1. Keypad Hotspot (Always clickable until unlocked) */}
-      {!progress.keypadUnlocked && (
-        <button
-          type="button"
-          className={hotspotClass}
-          style={{ top: '40%', left: '20%', width: '60px', height: '80px' }}
-          onClick={() => setActiveOverlay('keypad')}
-          title="Access Keypad"
-          aria-label="Access Keypad"
+      >
+        <img
+          src="/assets/control-panel.png"
+          alt="Ship control panel"
+          draggable={false}
+          className="absolute inset-0 h-full w-full select-none"
+          style={{ imageRendering: 'pixelated' }}
         />
-      )}
 
-      {/* 2. Terminal Hotspot (Only clickable AFTER Keypad is unlocked, disappears after crashed) */}
-      {progress.keypadUnlocked && !progress.terminalCrashed && (
-        <button
-          type="button"
-          className={hotspotClass}
-          style={{ top: '45%', left: '50%', width: '120px', height: '90px' }}
-          onClick={() => setActiveOverlay('terminal')}
-          title="Main Terminal"
-          aria-label="Main Terminal"
-        />
-      )}
-
-      {/* 3. Wiring Panel Hotspot (Only appears AFTER Terminal crashes) */}
-      {progress.terminalCrashed && !progress.powerRestored && (
-        <button
-          type="button"
-          className={`${hotspotClass} border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.7)]`}
-          style={{ top: '30%', left: '80%', width: '100px', height: '150px' }}
-          onClick={() => setActiveOverlay('wiring')}
-          title="Broken Wiring Panel"
-          aria-label="Broken Wiring Panel"
-        />
-      )}
-
-      {/* 4. Escape Pod Door (Appears AFTER power is restored) */}
-      {progress.powerRestored && (
-        <button
-          type="button"
-          className={`${hotspotClass} border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.9)]`}
-          style={{ top: '20%', left: '40%', width: '200px', height: '300px' }}
-          onClick={() => setActiveOverlay('escape')}
-          title="Enter Escape Pod"
-          aria-label="Enter Escape Pod"
-        />
-      )}
-
-      {/* --- MASSIVE OVERLAYS (Minigames) --- */}
-
-      {activeOverlay === 'keypad' && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
-          <KeypadMemoryGame
-            onWin={() => {
-              setProgress((prev) => ({ ...prev, keypadUnlocked: true }));
-              setActiveOverlay(null); // Close overlay on win
-            }}
+        {/* Ship status schematic sitting in the dark wedge under the viewport. */}
+        <div
+          className="pointer-events-none absolute flex flex-col items-center"
+          style={{ left: '44%', top: '59%', width: '12%' }}
+        >
+          <img
+            src={HULL_STATES[completedSteps]}
+            alt=""
+            className="w-full"
+            style={{ imageRendering: 'pixelated' }}
           />
-        </div>
-      )}
-
-      {activeOverlay === 'terminal' && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
-          <Terminal
-            onCrash={() => {
-              setProgress((prev) => ({ ...prev, terminalCrashed: true }));
-              setActiveOverlay(null);
-            }}
-          />
-        </div>
-      )}
-
-      {activeOverlay === 'wiring' && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
-          {/* Enovinx needs to drop his wiring component here! */}
-          <div className="text-white text-center">
-            <h2 className="text-2xl mb-4 text-yellow-500">ENOVINX WIRING GAME GOES HERE</h2>
-            <button
-              type="button"
-              className="p-4 bg-red-600 text-black font-bold hover:bg-red-500 transition-colors"
-              onClick={() => {
-                setProgress((prev) => ({ ...prev, powerRestored: true }));
-                setActiveOverlay(null);
-              }}
-            >
-              [DEV SKIP: WIN WIRING]
-            </button>
+          <div className="mt-1.5 flex gap-1.5">
+            {STEP_ORDER.map((flag, index) => (
+              <span
+                key={flag}
+                className="block h-2 w-2 rounded-full border border-black/60"
+                style={{
+                  background: progress[flag]
+                    ? '#4ade80'
+                    : index === completedSteps
+                      ? '#eab308'
+                      : '#27272a',
+                }}
+              />
+            ))}
           </div>
         </div>
-      )}
 
-      {activeOverlay === 'escape' && (
-        <div className="fixed inset-0 z-50 bg-black text-center">
-          <EscapePod onWin={() => alert('YOU WIN THE HACKATHON!')} />
+        {stations.map((station) => (
+          <button
+            key={station.id}
+            type="button"
+            onClick={() => openStation(station)}
+            disabled={!station.unlocked}
+            aria-label={station.label}
+            title={station.label}
+            style={station.rect}
+            className={`group absolute rounded-sm border-2 transition-colors duration-200 focus:outline-none ${
+              station.done
+                ? 'border-emerald-400/70 bg-emerald-400/5'
+                : station.unlocked
+                  ? 'station-ready cursor-pointer border-yellow-400/60 bg-yellow-400/5 hover:bg-yellow-400/25'
+                  : 'cursor-not-allowed border-zinc-500/20 bg-black/25'
+            }`}
+          >
+            <span
+              className={`pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-sm border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] transition-opacity duration-150 ${
+                station.unlocked
+                  ? 'border-yellow-400/40 bg-black/85 text-yellow-300 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
+                  : 'border-zinc-600/40 bg-black/85 text-zinc-500 opacity-0 group-hover:opacity-100'
+              }`}
+            >
+              {station.done ? `${station.label} ✓` : station.label}
+            </span>
+          </button>
+        ))}
+
+        {notice && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="pointer-events-none absolute bottom-[3%] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-yellow-400/40 bg-black/85 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-yellow-300"
+          >
+            {notice}
+          </div>
+        )}
+      </div>
+
+      {activeOverlay && (
+        <div className="fixed inset-0 z-50 overflow-auto bg-black/92">
+          <button
+            type="button"
+            onClick={() => setActiveOverlay(null)}
+            aria-label="Back to the bridge"
+            className="fixed right-4 top-4 z-[60] flex h-9 w-9 items-center justify-center border border-zinc-700 text-zinc-400 transition-colors hover:border-zinc-400 hover:text-zinc-100"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+
+          {activeOverlay === 'keypad' && (
+            <div className="flex min-h-full items-center justify-center p-6">
+              <KeypadMemoryGame onWin={() => complete('powerKeys')} />
+            </div>
+          )}
+
+          {activeOverlay === 'terminal' && (
+            <div className="flex min-h-full items-center justify-center">
+              <Terminal onCrash={() => complete('sysCrashed')} />
+            </div>
+          )}
+
+          {activeOverlay === 'generator' && (
+            <div className="flex min-h-full flex-col items-center justify-center gap-4 p-6">
+              <GeneratorRepairPuzzle onSolved={() => complete('coreFixed')} />
+            </div>
+          )}
+
+          {activeOverlay === 'wiring' && (
+            <div className="flex min-h-full items-center justify-center p-6">
+              <div className="text-center text-white">
+                <h2 className="mb-4 text-2xl text-yellow-500">
+                  ENOVINX WIRING GAME GOES HERE
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => complete('powerRestored')}
+                  className="bg-red-600 p-4 font-bold text-black transition-colors hover:bg-red-500"
+                >
+                  [DEV SKIP: WIN WIRING]
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeOverlay === 'escape' && (
+            <EscapePod
+              onWin={() => {
+                setActiveOverlay(null);
+                setNotice('Escape pod launched. You made it off the planet.');
+              }}
+            />
+          )}
         </div>
       )}
     </div>

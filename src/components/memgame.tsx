@@ -293,7 +293,6 @@ const CSS = `
   transition: filter 100ms ease;
 }
 
-/* State feedback as a tint overlay on top of the sprite fill. */
 .kpm-key::after {
   content: "";
   position: absolute;

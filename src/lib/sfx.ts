@@ -51,7 +51,6 @@ export function setMuted(value: boolean): void {
     try {
       window.localStorage.setItem(MUTE_KEY, value ? '1' : '0');
     } catch {
-      // ignore storage failures (private mode etc.)
     }
   }
   notify();
@@ -179,6 +178,5 @@ export function playSfx(name: SfxName): void {
   try {
     PRESETS[name](ac);
   } catch {
-    // never let sfx break gameplay
   }
 }

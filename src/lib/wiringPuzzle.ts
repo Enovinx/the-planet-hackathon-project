@@ -3,11 +3,11 @@ import { mulberry32 } from './generatorPuzzle';
 export const WIRE_COUNT = 5;
 
 export const WIRE_COLORS = [
-  '#22d3ee',
-  '#fbbf24',
-  '#a3e635',
-  '#f472b6',
-  '#a78bfa',
+  '#ffffff',
+  '#d4d4d8',
+  '#a1a1aa',
+  '#71717a',
+  '#52525b',
 ] as const;
 
 export interface WiringPuzzle {

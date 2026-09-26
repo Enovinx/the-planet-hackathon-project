@@ -296,18 +296,16 @@ export default function WiringPuzzle({ seed, onSolved }: Props) {
           setActive(null);
           setHover(null);
         }}
-        className={`relative aspect-[4/3] w-full cursor-crosshair touch-none overflow-hidden rounded-lg border-2 bg-zinc-950 transition-colors duration-200 ${
+        className={`relative aspect-[4/3] w-full cursor-crosshair touch-none overflow-hidden border-2 bg-zinc-950 transition-colors duration-200 ${
           rejected
-            ? 'border-red-500'
+            ? 'border-white'
             : solved
-              ? 'border-lime-400'
+              ? 'border-white'
               : 'border-zinc-700'
         }`}
       >
-        {/* Side rails the wires plug into. */}
         <div className="absolute inset-y-0 left-0 w-[8%] border-r border-zinc-800 bg-zinc-900/70" />
         <div className="absolute inset-y-0 right-0 w-[8%] border-l border-zinc-800 bg-zinc-900/70" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05),transparent_70%)]" />
 
         <svg
           viewBox="0 0 100 100"
@@ -398,15 +396,14 @@ export default function WiringPuzzle({ seed, onSolved }: Props) {
                 style={{
                   left: `${position.x}%`,
                   top: `${position.y}%`,
-                  borderColor: color,
-                  boxShadow: isLinked || isTarget ? `0 0 12px ${color}99` : undefined,
+                  borderColor: isActive ? '#ffffff' : color,
                 }}
-                className={`absolute z-10 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 bg-zinc-950 transition-transform duration-150 hover:scale-110 ${
+                className={`absolute z-10 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center border-2 bg-zinc-950 transition-transform duration-150 hover:scale-110 ${
                   isActive ? 'scale-125' : ''
                 } ${isTarget ? 'ring-2 ring-white/70' : ''}`}
               >
                 <span
-                  className="block h-3.5 w-3.5 rounded-full"
+                  className="block h-3.5 w-3.5"
                   style={{ background: color }}
                 />
               </button>
@@ -420,7 +417,7 @@ export default function WiringPuzzle({ seed, onSolved }: Props) {
               role="status"
               aria-live="polite"
               className={`font-mono text-sm uppercase tracking-[0.3em] ${
-                solved ? 'text-lime-400' : 'text-red-500'
+                solved ? 'text-zinc-100' : 'text-zinc-500'
               }`}
             >
               {solved ? 'Circuit complete' : 'No matching terminal'}

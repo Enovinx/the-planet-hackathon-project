@@ -27,7 +27,7 @@ function AnotherPage() {
         <p>Click the button below to add a random number to the database.</p>
         <p>
           <button
-            className="bg-dark dark:bg-light text-light dark:text-dark text-sm px-4 py-2 rounded-md border-2"
+            className="bg-dark dark:bg-light text-light dark:text-dark text-sm px-4 py-2 border-2"
             onClick={() => {
               setActionMessage(null)
               void callMyAction({
@@ -41,7 +41,7 @@ function AnotherPage() {
           </button>
           {actionMessage !== null ? <p>{actionMessage}</p> : null}
         </p>
-        <Link to="/" className="text-blue-600 underline hover:no-underline">
+        <Link to="/" className="text-zinc-100 underline hover:no-underline">
           Back
         </Link>
       </div>

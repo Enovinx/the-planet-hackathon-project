@@ -195,7 +195,7 @@ const CSS = `
   --kpm-panel: #202327;
   --kpm-rivet: #34373c;
   --kpm-text: #ffffff;
-  --kpm-muted: #cccccc;
+  --kpm-muted: #ffffff;
   --kpm-accent: #ff9f2e;
   --kpm-accent-dim: #5c421c;
   --kpm-bad: #ff4d4d;
@@ -247,7 +247,8 @@ const CSS = `
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--kpm-accent);
+  color: #ffffff;
+  text-shadow: none;
 }
 
 .kpm-meta {
@@ -275,7 +276,7 @@ const CSS = `
   font-size: 17px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--kpm-accent);
+  color: #ffffff;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
 }
 
@@ -283,13 +284,13 @@ const CSS = `
   min-height: 20px;
   margin: 0 0 18px;
   font-size: 13px;
-  color: var(--kpm-muted);
+  color: #ffffff;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   letter-spacing: 0.01em;
 }
-.kpm-status--input { color: var(--kpm-text); }
-.kpm-status--fail { color: var(--kpm-bad); }
-.kpm-status--won { color: var(--kpm-accent); }
+.kpm-status--input { color: #ffffff; }
+.kpm-status--fail { color: #ffffff; }
+.kpm-status--won { color: #ffffff; }
 
 .kpm-grid {
   display: grid;
@@ -316,7 +317,7 @@ const CSS = `
 .kpm-key--lit {
   background: var(--kpm-accent);
   border-color: var(--kpm-accent);
-  color: #1a1104;
+  color: #ffffff;
 }
 .kpm-key--good {
   background: var(--kpm-accent-dim);
@@ -325,7 +326,7 @@ const CSS = `
 .kpm-key--bad {
   background: var(--kpm-bad);
   border-color: var(--kpm-bad);
-  color: #1a0505;
+  color: #ffffff;
 }
 
 .kpm-controls {
@@ -350,10 +351,10 @@ const CSS = `
 .kpm-btn--primary {
   background: var(--kpm-accent);
   border-color: var(--kpm-accent);
-  color: #1a1104;
+  color: #ffffff;
 }
 .kpm-btn--ghost {
-  color: var(--kpm-muted);
+  color: #ffffff;
 }
 
 .kpm-key:focus-visible,

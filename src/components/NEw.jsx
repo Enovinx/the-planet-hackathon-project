@@ -1,16 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useState, useRef, useCallback } from "react";
 
-/**
- * KeypadMemoryGame
- * A standalone "Simon Says"-style memory game on a 3x3 numeric keypad.
- * Sequence length starts at 3 and grows to 12 (win condition).
- *
- * Drop this file into any React project — no external CSS or libraries
- * required. Styles are scoped via a <style> tag with a unique class
- * prefix so it won't collide with the rest of your app.
- */
-
 const START_LENGTH = 3;
 const MAX_LENGTH = 12;
 const SHOW_DELAY_MS = 550; // time each key stays lit

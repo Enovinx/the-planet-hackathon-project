@@ -87,9 +87,6 @@ const TOOL_CONFIG = {
   },
 };
 
-// One shared model instance. Conversation state is managed manually through
-// `contents` because the Gemini API rejects the `role: 'function'` history
-// entries that the ChatSession helper sends on tool round-trips.
 const MODEL = genAI.getGenerativeModel({
   model: MODEL_NAME,
   systemInstruction: SYSTEM_INSTRUCTION,

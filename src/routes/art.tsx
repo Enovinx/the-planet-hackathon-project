@@ -14,6 +14,7 @@ const SPRITES = [
   'spritepaint 45.png',
   'spritepaint 48.png',
   'spritepaint 49.png',
+  'spritepaint 53.png',
 ];
 
 function SpriteCard({ file }: { file: string }) {
@@ -65,7 +66,7 @@ function SpriteCard({ file }: { file: string }) {
 
 function ArtPage() {
   return (
-    <main className="min-h-screen bg-zinc-950 p-8">
+    <main className="art-page min-h-screen bg-zinc-950 p-8">
       <style>{`
         .art-checker {
           background-image:

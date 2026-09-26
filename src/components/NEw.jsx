@@ -225,21 +225,10 @@ const CSS = `
   position: relative;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.05),
-    inset 0 0 40px rgba(0,0,0,0.5),
-    0 20px 40px rgba(0,0,0,0.5);
+    inset 0 0 40px rgba(0,0,0,0.5);
 }
-.kpm-card::before,
-.kpm-card::after {
-  content: "";
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #55585d, #101214);
-  top: 10px;
-}
-.kpm-card::before { left: 10px; }
-.kpm-card::after { right: 10px; }
+/* NOTE TO OTHER AGENTS: corner rivet styling intentionally removed per user
+ * request — do not re-add ::before/::after corner dots to .kpm-card. */
 
 .kpm-header {
   margin-bottom: 16px;

@@ -46,7 +46,6 @@ function endpointAt(puzzle: GeneratorPuzzle, cell: Pos): number | null {
   return null;
 }
 
-/** The twin of the endpoint a path started from (paths always start at an endpoint). */
 function twinOf(
   puzzle: GeneratorPuzzle,
   color: number,

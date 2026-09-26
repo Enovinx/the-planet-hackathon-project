@@ -1,20 +1,11 @@
 import * as React from 'react';
 
-/**
- * The airlock has no power: the player wakes in pitch darkness and has to find
- * a small, unmarked light switch somewhere on the screen before they can see
- * or touch anything in the room.
- *
- * `children` is the room scene. Until the lights come on this gate sits on top
- * of it, swallowing pointer events, then flickers the room into view.
- */
 
 interface AirlockLightsProps {
   children: React.ReactNode;
   onLightsOn?: () => void;
 }
 
-// Keep the switch clear of the very edges so it is always reachable.
 const SWITCH_MIN_PERCENT = 12;
 const SWITCH_MAX_PERCENT = 84;
 

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { playSfx } from '~/lib/sfx';
 
 
 const LINES: string[] = [
@@ -27,6 +28,7 @@ export default function Intro({ onComplete }: IntroProps) {
 
   const complete = React.useCallback(() => {
     setPhase('done');
+    playSfx('click');
     onComplete?.();
   }, [onComplete]);
 

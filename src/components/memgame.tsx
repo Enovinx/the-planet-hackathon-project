@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import { playSfx } from "~/lib/sfx";
 
 const START_LENGTH = 3;
 const MAX_LENGTH = 6;
@@ -45,7 +46,10 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
     setStatus("showing");
     setInputIndex(0);
     seq.forEach((key, i) => {
-      schedule(() => setActiveKey(key), i * (SHOW_DELAY_MS + GAP_MS));
+      schedule(() => {
+        setActiveKey(key);
+        playSfx("keyShow");
+      }, i * (SHOW_DELAY_MS + GAP_MS));
       schedule(
         () => setActiveKey(null),
         i * (SHOW_DELAY_MS + GAP_MS) + SHOW_DELAY_MS
@@ -56,6 +60,7 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
 
   const startGame = (): void => {
     clearTimers();
+    playSfx("click");
     const first = Array.from({ length: START_LENGTH }, randomKey);
     setSequence(first);
     playSequence(first);
@@ -78,6 +83,7 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
 
     if (!correct) {
       setStatus("fail");
+      playSfx("keyBad");
       return;
     }
 
@@ -85,12 +91,15 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
     if (nextIndex === sequence.length) {
       if (sequence.length === MAX_LENGTH) {
         setStatus("won");
+        playSfx("win");
         onWin?.();
       } else {
+        playSfx("keyGood");
         setStatus("success");
         nextLevel(sequence);
       }
     } else {
+      playSfx("keyGood");
       setInputIndex(nextIndex);
     }
   };

@@ -3,6 +3,7 @@ import KeypadMemoryGame from './memgame';
 import Terminal from './terminal';
 import EscapePod from './escapepod';
 import GeneratorRepairPuzzle from './GeneratorRepairPuzzle';
+import SoundToggle from './SoundToggle';
 import WiringPuzzle from './WiringPuzzle';
 
 type OverlayType =
@@ -117,6 +118,7 @@ export default function AirlockRoom() {
 
   return (
     <div className="flex h-full w-full items-center justify-center overflow-hidden bg-black">
+      <SoundToggle />
       <div
         className="relative max-h-screen"
         style={{

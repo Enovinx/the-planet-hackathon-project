@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
+import { playSfx } from '~/lib/sfx';
 
 export type GameState = 'START' | 'PLAYING' | 'GAME_OVER' | 'WIN';
 
@@ -67,6 +68,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
       if (e.code === 'Space') {
         if (!keys.Space) {
           bullets.push({ x: player.x + 12, y: player.y, width: 6, height: 15, speed: 7 });
+          playSfx('shoot');
         }
         keys.Space = true;
       }
@@ -127,6 +129,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
           player.height + player.y > ast.y
         ) {
           isRunning = false;
+          playSfx('explode');
           setGameState('GAME_OVER');
           return;
         }
@@ -149,6 +152,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
           ) {
             asteroids.splice(aIndex, 1);
             bullets.splice(bIndex, 1);
+            playSfx('explode');
             break;
           }
         }
@@ -179,6 +183,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
       timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     } else if (timeLeft === 0 && gameState === 'PLAYING') {
       setGameState('WIN');
+      playSfx('win');
       const winTimer = setTimeout(() => {
         onWin?.();
       }, 3000);

@@ -9,6 +9,7 @@ import {
   type GeneratorPuzzle,
   type Pos,
 } from '~/lib/generatorPuzzle';
+import { playSfx } from '~/lib/sfx';
 
 interface PairStyle {
   main: string;
@@ -91,6 +92,7 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
   React.useEffect(() => {
     if (!solved && isSolved(paths, puzzle.endpoints, puzzle.size)) {
       setSolved(true);
+      playSfx('solved');
       onSolved?.();
     }
   }, [paths, puzzle, solved, onSolved]);
@@ -253,6 +255,7 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
       });
       drawingRef.current = false;
       setActive(null);
+      playSfx('lock');
       return;
     }
 

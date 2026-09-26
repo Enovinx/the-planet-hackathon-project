@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { playSfx } from '~/lib/sfx';
 
 
 interface AirlockLightsProps {
@@ -26,6 +27,7 @@ export default function AirlockLights({
   const turnOnLights = React.useCallback(() => {
     setLightsOn((prev) => {
       if (prev) return prev;
+      playSfx('lights');
       onLightsOn?.();
       return true;
     });

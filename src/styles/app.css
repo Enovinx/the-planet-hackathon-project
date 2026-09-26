@@ -10,6 +10,11 @@
  */
 body *:not(.art-page):not(.art-page *) {
   color: #ffffff !important;
+  border-color: #ffffff !important;
+  background-color: #000000 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
 }
 
 @layer base {

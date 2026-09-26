@@ -82,10 +82,6 @@ function ArtPage() {
       <h1 className="mb-1 font-mono text-lg font-bold uppercase tracking-[0.3em] text-zinc-100">
         Pixel Art — cleaned
       </h1>
-      <p className="mb-8 font-mono text-xs text-zinc-500">
-        White background removed (transparent), cropped to colored bounds.
-        Rendered at {SCALE} CSS px per source pixel, image-rendering: pixelated.
-      </p>
       <div className="flex flex-wrap items-start gap-10">
         {SPRITES.map((file) => (
           <SpriteCard key={file} file={file} />

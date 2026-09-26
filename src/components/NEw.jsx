@@ -115,19 +115,16 @@ export default function KeypadMemoryGame() {
 
       <div className="kpm-card">
         <header className="kpm-header">
-          <span className="kpm-eyebrow">Nav Computer // Auth Relay</span>
           <h1 className="kpm-title">Access Terminal</h1>
         </header>
 
         <div className="kpm-meta">
           <div className="kpm-meta-item">
-            <span className="kpm-meta-label">Clearance Tier</span>
             <span className="kpm-meta-value">
               {status === "idle" ? "—" : `${level} / ${MAX_LENGTH}`}
             </span>
           </div>
           <div className="kpm-meta-item">
-            <span className="kpm-meta-label">Max Tier</span>
             <span className="kpm-meta-value">{best}</span>
           </div>
         </div>
@@ -196,9 +193,9 @@ const CSS = `
   --kpm-rivet: #34373c;
   --kpm-text: #ffffff;
   --kpm-muted: #ffffff;
-  --kpm-accent: #ff9f2e;
-  --kpm-accent-dim: #5c421c;
-  --kpm-bad: #ff4d4d;
+  --kpm-accent: #ffffff;
+  --kpm-accent-dim: #ffffff;
+  --kpm-bad: #ffffff;
   min-height: 100%;
   width: 100%;
   display: flex;

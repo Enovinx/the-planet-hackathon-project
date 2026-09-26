@@ -25,6 +25,10 @@ export const PAIR_STYLES: PairStyle[] = [
 
 const BOUNCE = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 
+/** The core is junked: it has to be re-linked twice before it will hold. */
+const ROUNDS = 2;
+const SOLVED_HOLD_MS = 1600;
+
 interface Props {
   seed?: number;
   onSolved?: () => void;
@@ -72,6 +76,8 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
   const [locked, setLocked] = React.useState<boolean[]>(emptyLocks);
   const [active, setActive] = React.useState<number | null>(null);
   const [solved, setSolved] = React.useState(false);
+  const [round, setRound] = React.useState(0);
+  const [cleared, setCleared] = React.useState(false);
   const [puzzleId, setPuzzleId] = React.useState(0);
   const drawingRef = React.useRef(false);
   const glowRef = React.useRef<HTMLDivElement>(null);
@@ -86,16 +92,25 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
     setLocked(emptyLocks());
     setActive(null);
     setSolved(false);
+    setRound(0);
+    setCleared(false);
     setPuzzleId((n) => n + 1);
   }, [seed]);
 
   React.useEffect(() => {
-    if (!solved && isSolved(paths, puzzle.endpoints, puzzle.size)) {
-      setSolved(true);
-      playSfx('solved');
-      onSolved?.();
+    if (solved || cleared) return;
+    if (!isSolved(paths, puzzle.endpoints, puzzle.size)) return;
+    drawingRef.current = false;
+    setActive(null);
+    playSfx('solved');
+    if (round < ROUNDS - 1) {
+      // Grid cleared, but the core still isn't holding: re-rack a new board.
+      setCleared(true);
+      return;
     }
-  }, [paths, puzzle, solved, onSolved]);
+    setSolved(true);
+    window.setTimeout(() => onSolved?.(), SOLVED_HOLD_MS);
+  }, [paths, puzzle, solved, cleared, round, onSolved]);
 
   // Spring-physics drag head: lerps toward the active tip with a bounce.
   React.useEffect(() => {
@@ -295,9 +310,22 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
     setPuzzleId((n) => n + 1);
   }
 
+  function nextRound(): void {
+    setRound((r) => r + 1);
+    setPuzzle(generatePuzzle());
+    setPaths(emptyPaths());
+    setLocked(emptyLocks());
+    setActive(null);
+    setCleared(false);
+    setPuzzleId((n) => n + 1);
+  }
+
   return (
     <div className="gr-anim w-full max-w-xl mx-auto flex flex-col gap-4 select-none">
       <div className="flex items-center justify-between">
+        <h2 className="font-mono text-base font-bold uppercase tracking-[0.3em] text-zinc-100">
+          Power Core {round + 1}/{ROUNDS}
+        </h2>
         <div className="flex items-center gap-2" role="status">
           {PAIR_STYLES.map((s, i) => (
             <span
@@ -481,6 +509,26 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
               <div className="absolute inset-[22%] rounded-full bg-white/90" />
             </div>
           </div>
+
+          {cleared && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-xl">
+              <div className="flex flex-col items-center gap-4 border-2 border-lime-400 bg-zinc-950 px-8 py-6 animate-[gr-overlay-in_0.5s_cubic-bezier(0.34,1.56,0.64,1)_backwards]">
+                <p className="font-mono text-sm uppercase tracking-[0.25em] text-lime-400">
+                  Link {round + 1}/{ROUNDS} stabilized
+                </p>
+                <p className="max-w-xs text-center font-mono text-xs text-zinc-400">
+                  The core won't hold yet. Re-route the next cell bank.
+                </p>
+                <button
+                  type="button"
+                  onClick={nextRound}
+                  className="pixel-btn px-5 py-2 font-mono text-sm font-extrabold uppercase tracking-wider text-black"
+                >
+                  Next board
+                </button>
+              </div>
+            </div>
+          )}
 
           {solved && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-xl">

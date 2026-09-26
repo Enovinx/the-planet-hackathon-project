@@ -70,6 +70,29 @@ body *:not(.art-page):not(.art-page *) {
   }
 }
 
+@keyframes intro-page-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+    filter: blur(4px);
+  }
+}
+
 @keyframes intro-line-fade {
   0% {
     opacity: 0;
@@ -153,6 +176,17 @@ body *:not(.art-page):not(.art-page *) {
 
 .intro-line {
   animation: intro-line-fade 1.5s ease-in-out both;
+}
+
+/* Multi-sentence story beats: long enough to actually read, timed from JS. */
+.intro-page {
+  animation: intro-page-fade 4.6s ease-in-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-page {
+    animation: none;
+  }
 }
 
 .intro-anim--blink .intro-eyelid--top {

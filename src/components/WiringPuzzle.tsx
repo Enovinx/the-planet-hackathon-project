@@ -267,7 +267,7 @@ export default function WiringPuzzle({ seed, onSolved }: Props) {
             type="button"
             onClick={reset}
             aria-label="reset wiring"
-            className="flex h-8 w-8 items-center justify-center border border-zinc-700 text-zinc-400 transition-colors hover:border-zinc-400 hover:text-zinc-100"
+            className="pixel-btn--sm flex h-8 w-8 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-100"
           >
             <svg
               width="14"

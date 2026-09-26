@@ -150,6 +150,7 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
             const flash = flashKey && flashKey.key === key ? flashKey : null;
             const classes = [
               "kpm-key",
+              "pixel-btn",
               isActive ? "kpm-key--lit" : "",
               flash ? (flash.correct ? "kpm-key--good" : "kpm-key--bad") : "",
             ]
@@ -164,7 +165,7 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
                 onClick={() => handleKeyPress(key)}
                 aria-label={`Key ${key}`}
               >
-                {key}
+                <span className="relative z-10">{key}</span>
               </button>
             );
           })}
@@ -172,17 +173,17 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
 
         <div className="kpm-controls">
           {status === "idle" && (
-            <button className="kpm-btn kpm-btn--primary" onClick={startGame}>
+            <button className="kpm-btn kpm-btn--primary pixel-btn" onClick={startGame}>
               Engage uplink
             </button>
           )}
           {(status === "fail" || status === "won") && (
-            <button className="kpm-btn kpm-btn--primary" onClick={startGame}>
+            <button className="kpm-btn kpm-btn--primary pixel-btn" onClick={startGame}>
               Retry uplink
             </button>
           )}
           {status !== "idle" && (
-            <button className="kpm-btn kpm-btn--ghost" onClick={reset}>
+            <button className="kpm-btn kpm-btn--ghost pixel-btn" onClick={reset}>
               Abort
             </button>
           )}
@@ -283,37 +284,31 @@ const CSS = `
 .kpm-key {
   aspect-ratio: 1 / 1;
   border-radius: 0px;
-  border: 2px solid var(--kpm-rivet);
-  background: var(--kpm-hull);
   color: var(--kpm-text);
   font-size: 22px;
   font-weight: 900;
   cursor: pointer;
   font-family: inherit;
-  transition: background 100ms ease, box-shadow 100ms ease;
+  position: relative;
+  transition: filter 100ms ease;
 }
+
+/* State feedback as a tint overlay on top of the sprite fill. */
+.kpm-key::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.kpm-key--lit::after { background: rgba(251, 191, 36, 0.75); }
+.kpm-key--good::after { background: rgba(34, 197, 94, 0.6); }
+.kpm-key--bad::after { background: rgba(239, 68, 68, 0.65); }
 .kpm-key:disabled { cursor: default; opacity: 0.35; }
 .kpm-key:not(:disabled):active {
   transform: translateY(1px);
 }
 
-.kpm-key--lit {
-  background: var(--kpm-accent);
-  border-color: var(--kpm-accent);
-  color: #1a1104;
-  box-shadow: 0 0 18px rgba(251, 191, 36, 0.5);
-}
-.kpm-key--good {
-  background: #166534;
-  border-color: #22c55e;
-  color: #4ade80;
-}
-.kpm-key--bad {
-  background: #450a0a;
-  border-color: var(--kpm-bad);
-  color: #f87171;
-  box-shadow: 0 0 18px rgba(255, 59, 59, 0.5);
-}
+
 
 .kpm-controls {
   display: flex;

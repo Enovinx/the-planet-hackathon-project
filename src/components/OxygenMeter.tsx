@@ -94,7 +94,7 @@ export default function OxygenMeter({ onRestart }: OxygenMeterProps) {
           <button
             type="button"
             onClick={restart}
-            className="mt-6 border-2 border-red-500/60 px-8 py-3 text-base font-bold uppercase tracking-[0.35em] text-red-300 transition-colors hover:border-red-400 hover:text-red-200"
+            className="pixel-btn mt-6 px-8 py-3 text-base font-bold uppercase tracking-[0.35em] text-black"
           >
             Try Again
           </button>

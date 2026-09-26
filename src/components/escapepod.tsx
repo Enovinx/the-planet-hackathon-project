@@ -38,10 +38,23 @@ interface KeyState {
   Space: boolean;
 }
 
+const ROCKET_SRC = '/assets/spritepaint 45.png'; // 55x74 cleaned sprite
+const ASTEROID_SRC = '/assets/spritepaint 43.png'; // 24x21 cleaned sprite
+
 export default function EscapePod({ onWin }: EscapePodProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>('START');
   const [timeLeft, setTimeLeft] = useState<number>(20);
+  const spritesRef = useRef<{ rocket?: HTMLImageElement; asteroid?: HTMLImageElement }>({});
+
+  // Load the pixel-art sprites once at native size; drawn crisp on canvas.
+  useEffect(() => {
+    const rocket = new Image();
+    rocket.src = ROCKET_SRC;
+    const asteroid = new Image();
+    asteroid.src = ASTEROID_SRC;
+    spritesRef.current = { rocket, asteroid };
+  }, []);
 
   useEffect(() => {
     if (gameState !== 'PLAYING') return;
@@ -54,6 +67,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
 
     let animationFrameId: number;
     let isRunning = true;
+    ctx.imageSmoothingEnabled = false; // crisp pixel scaling
 
     const player: Player = { x: 275, y: 350, width: 30, height: 30, speed: 5, dx: 0 };
     let bullets: Bullet[] = [];
@@ -165,13 +179,19 @@ export default function EscapePod({ onWin }: EscapePodProps) {
         burst(player.x + 15, player.y + 30, '#00ccff', 1, 1.5);
       }
 
-      ctx.fillStyle = '#00ff00';
-      ctx.beginPath();
-      ctx.moveTo(player.x + 15, player.y);
-      ctx.lineTo(player.x + 30, player.y + 30);
-      ctx.lineTo(player.x, player.y + 30);
-      ctx.closePath();
-      ctx.fill();
+      const rocket = spritesRef.current.rocket;
+      if (rocket && rocket.complete && rocket.naturalWidth > 0) {
+        // Native 55x74 sprite centered on the 30x30 hitbox.
+        ctx.drawImage(rocket, player.x + 15 - 55 / 2, player.y + 30 - 74, 55, 74);
+      } else {
+        ctx.fillStyle = '#00ff00';
+        ctx.beginPath();
+        ctx.moveTo(player.x + 15, player.y);
+        ctx.lineTo(player.x + 30, player.y + 30);
+        ctx.lineTo(player.x, player.y + 30);
+        ctx.closePath();
+        ctx.fill();
+      }
 
       if (frameCount % 30 === 0) {
         asteroids.push({
@@ -187,12 +207,14 @@ export default function EscapePod({ onWin }: EscapePodProps) {
         const ast = asteroids[i];
         ast.y += ast.speed;
 
-        ctx.fillStyle = '#ff0000';
-        ctx.fillRect(ast.x, ast.y, ast.width, ast.height);
-
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(ast.x, ast.y, ast.width, ast.height);
+        const asteroid = spritesRef.current.asteroid;
+        if (asteroid && asteroid.complete && asteroid.naturalWidth > 0) {
+          // Native 24x21 sprite scaled 1.5x to fill the 30x30 hitbox.
+          ctx.drawImage(asteroid, ast.x, ast.y, 30, 30);
+        } else {
+          ctx.fillStyle = '#ff0000';
+          ctx.fillRect(ast.x, ast.y, ast.width, ast.height);
+        }
 
         if (
           player.x < ast.x + ast.width &&
@@ -307,7 +329,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
                 <button
                   type="button"
                   onClick={() => setGameState('PLAYING')}
-                  className="px-6 py-3 bg-green-600 text-black font-bold text-xl hover:bg-green-500 border-2 border-green-400 shadow-[4px_4px_0px_#000]"
+                  className="pixel-btn px-6 py-3 font-bold text-xl text-black"
                 >
                   INITIATE LAUNCH
                 </button>
@@ -322,7 +344,7 @@ export default function EscapePod({ onWin }: EscapePodProps) {
                     setGameState('START');
                     setTimeLeft(20);
                   }}
-                  className="px-6 py-3 bg-red-900 text-white font-bold text-xl hover:bg-red-700 border-2 border-red-500 shadow-[4px_4px_0px_#000]"
+                  className="pixel-btn px-6 py-3 font-bold text-xl text-black"
                 >
                   REBOOT SYSTEMS
                 </button>

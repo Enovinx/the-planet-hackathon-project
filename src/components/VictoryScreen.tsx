@@ -133,7 +133,7 @@ export default function VictoryScreen({
             />
             <button
               type="submit"
-              className="flex-1 border-2 border-yellow-400 bg-yellow-400 px-4 py-2 font-mono text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-yellow-300"
+              className="pixel-btn flex-1 px-4 py-2 font-mono text-sm font-bold uppercase tracking-widest text-black"
             >
               Log run
             </button>
@@ -179,7 +179,7 @@ export default function VictoryScreen({
         <button
           type="button"
           onClick={onRestart}
-          className="mt-2 border-2 border-emerald-400 bg-emerald-400 px-6 py-3 font-mono text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-emerald-300"
+          className="pixel-btn mt-2 px-6 py-3 font-mono text-sm font-bold uppercase tracking-widest text-black"
         >
           Play again
         </button>

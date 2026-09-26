@@ -5,9 +5,11 @@ export const Route = createFileRoute('/art')({
   component: ArtPage,
 });
 
-const SCALE = 15;
+const SCALE = 8; // 1 source pixel = 8 CSS pixels, identical for every sprite
 
 const SPRITES = [
+  'spritepaint 41.png',
+  'spritepaint 43.png',
   'spritepaint 44.png',
   'spritepaint 45.png',
   'spritepaint 48.png',

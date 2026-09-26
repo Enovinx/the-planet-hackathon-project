@@ -321,7 +321,7 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
             type="button"
             onClick={reset}
             aria-label="reset"
-            className="w-9 h-9 flex items-center justify-center rounded border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:scale-105 active:scale-90 transition-all duration-200"
+            className="pixel-btn--sm w-9 h-9 flex items-center justify-center rounded text-zinc-300 hover:scale-105 active:scale-90 transition-all duration-200"
             style={{ transitionTimingFunction: BOUNCE }}
           >
             <svg
@@ -343,7 +343,7 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
             type="button"
             onClick={newPuzzle}
             aria-label="new"
-            className="w-9 h-9 flex items-center justify-center rounded bg-red-700 text-white hover:bg-red-600 hover:scale-105 active:scale-90 transition-all duration-200"
+            className="pixel-btn--sm w-9 h-9 flex items-center justify-center rounded text-white hover:scale-105 active:scale-90 transition-all duration-200"
             style={{ transitionTimingFunction: BOUNCE }}
           >
             <svg
@@ -507,7 +507,7 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
                   type="button"
                   onClick={newPuzzle}
                   aria-label="next"
-                  className="w-11 h-11 flex items-center justify-center rounded bg-lime-400 text-black hover:bg-lime-300 hover:scale-110 active:scale-90 transition-all duration-200"
+                  className="pixel-btn--sm w-11 h-11 flex items-center justify-center rounded text-black hover:scale-110 active:scale-90 transition-all duration-200"
                   style={{ transitionTimingFunction: BOUNCE }}
                 >
                   <svg

@@ -267,3 +267,19 @@
     animation: none;
   }
 }
+
+/* Pixel-art button: spritepaint 41 is 9-slice stretched from a 31x13 source
+   (slice 5px caps), rendered at 8x to match the game's 1px = 8px scale.
+   button.pixel-btn outspecifies inline component styles like .kpm-btn. */
+button.pixel-btn {
+  border: 8px solid transparent;
+  border-image: url('/assets/spritepaint 41.png') 5 fill / 8px stretch;
+  image-rendering: pixelated;
+}
+
+/* Compact variant for icon-sized buttons. */
+button.pixel-btn--sm {
+  border: 6px solid transparent;
+  border-image: url('/assets/spritepaint 41.png') 5 fill / 6px stretch;
+  image-rendering: pixelated;
+}

@@ -380,7 +380,7 @@ export default function Terminal({ onCrash }: TerminalProps) {
           <button
             type="submit"
             disabled={isTyping || secondsRemaining === 0}
-            className="bg-red-800 px-6 py-2 font-extrabold uppercase tracking-wider text-black transition-all hover:bg-red-600 disabled:opacity-40"
+            className="pixel-btn px-6 py-2 font-extrabold uppercase tracking-wider text-black disabled:opacity-40"
           >
             Transmit
           </button>

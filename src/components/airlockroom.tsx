@@ -3,8 +3,9 @@ import KeypadMemoryGame from './memgame';
 import Terminal from './terminal';
 import EscapePod from './escapepod';
 import GeneratorRepairPuzzle from './GeneratorRepairPuzzle';
-import SoundToggle from './SoundToggle';
 import WiringPuzzle from './WiringPuzzle';
+import SoundToggle from './SoundToggle';
+import VictoryScreen from './VictoryScreen';
 
 type OverlayType =
   | 'keypad'
@@ -58,6 +59,9 @@ export default function AirlockRoom() {
   const [progress, setProgress] = useState<Progress>(EMPTY_PROGRESS);
   const [notice, setNotice] = useState<string | null>(null);
   const [escaped, setEscaped] = useState<boolean>(false);
+  const [runStartMs, setRunStartMs] = useState<number | null>(null);
+  const [skipCount, setSkipCount] = useState<number>(0);
+  const [finalDurationMs, setFinalDurationMs] = useState<number>(0);
 
   const complete = useCallback((flag: keyof Progress) => {
     setProgress((prev) => ({ ...prev, [flag]: true }));
@@ -121,7 +125,10 @@ export default function AirlockRoom() {
   // stage, RESET restarts the whole run for the next demo.
   const skipStage = useCallback(() => {
     const next = STEP_ORDER.find((flag) => !progress[flag]);
-    if (next) complete(next);
+    if (next) {
+      complete(next);
+      setSkipCount((n) => n + 1);
+    }
     setActiveOverlay(null);
   }, [progress, complete]);
 
@@ -130,6 +137,9 @@ export default function AirlockRoom() {
     setEscaped(false);
     setActiveOverlay(null);
     setNotice(null);
+    setRunStartMs(null);
+    setSkipCount(0);
+    setFinalDurationMs(0);
   }, []);
 
   return (
@@ -262,7 +272,14 @@ export default function AirlockRoom() {
 
           {activeOverlay === 'keypad' && (
             <div className="flex min-h-full items-center justify-center p-6">
-              <KeypadMemoryGame onWin={() => complete('powerKeys')} />
+              <KeypadMemoryGame
+                onWin={() => {
+                  setRunStartMs((prev) =>
+                    prev === null ? Date.now() : prev,
+                  );
+                  complete('powerKeys');
+                }}
+              />
             </div>
           )}
 
@@ -288,6 +305,9 @@ export default function AirlockRoom() {
             <EscapePod
               onWin={() => {
                 setActiveOverlay(null);
+                setFinalDurationMs(
+                  runStartMs === null ? 0 : Date.now() - runStartMs,
+                );
                 setEscaped(true);
               }}
             />
@@ -296,38 +316,11 @@ export default function AirlockRoom() {
       )}
 
       {escaped && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black p-6">
-          <div className="flex w-full max-w-md flex-col items-center gap-5 border-2 border-emerald-400 bg-zinc-950 px-8 py-10 text-center shadow-[10px_10px_0px_rgba(52,211,153,1)]">
-            <img
-              src="/assets/ship/Main%20Ship%20-%20Base%20-%20Full%20health.png"
-              alt="Restored ship"
-              draggable={false}
-              className="w-3/4 select-none"
-              style={{ imageRendering: 'pixelated' }}
-            />
-            <p className="font-mono text-[11px] uppercase tracking-[0.35em] text-emerald-400">
-              Signal reached
-            </p>
-            <h2 className="font-mono text-3xl font-bold uppercase tracking-widest text-zinc-100">
-              Escaped
-            </h2>
-            <p className="font-mono text-sm leading-relaxed text-zinc-400">
-              Escape pod launched. You cleared the debris field and made it
-              off the planet. The rescue fleet has your signal.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setProgress(EMPTY_PROGRESS);
-                setEscaped(false);
-                setNotice(null);
-              }}
-              className="mt-2 border-2 border-emerald-400 bg-emerald-400 px-6 py-3 font-mono text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-emerald-300"
-            >
-              Play again
-            </button>
-          </div>
-        </div>
+        <VictoryScreen
+          durationMs={finalDurationMs}
+          skipped={skipCount}
+          onRestart={resetDemo}
+        />
       )}
     </div>
   );

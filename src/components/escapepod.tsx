@@ -60,6 +60,54 @@ export default function EscapePod({ onWin }: EscapePodProps) {
     let asteroids: Asteroid[] = [];
     let frameCount = 0;
 
+    interface Star {
+      x: number;
+      y: number;
+      speed: number;
+      size: number;
+    }
+    interface Particle {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      life: number;
+      maxLife: number;
+      color: string;
+      size: number;
+    }
+    const stars: Star[] = Array.from({ length: 70 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      speed: 0.5 + Math.random() * 2,
+      size: Math.random() < 0.2 ? 2 : 1,
+    }));
+    let particles: Particle[] = [];
+    let shake = 0;
+
+    const burst = (
+      x: number,
+      y: number,
+      color: string,
+      count: number,
+      power: number,
+    ): void => {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const v = (0.5 + Math.random()) * power;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * v,
+          vy: Math.sin(angle) * v,
+          life: 20 + Math.random() * 20,
+          maxLife: 40,
+          color,
+          size: 1 + Math.random() * 3,
+        });
+      }
+    };
+
     const keys: KeyState = { ArrowLeft: false, ArrowRight: false, Space: false };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -90,8 +138,32 @@ export default function EscapePod({ onWin }: EscapePodProps) {
       ctx.fillStyle = '#050505';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      ctx.save();
+      if (shake > 0) {
+        ctx.translate(
+          (Math.random() - 0.5) * shake,
+          (Math.random() - 0.5) * shake,
+        );
+        shake *= 0.88;
+        if (shake < 0.5) shake = 0;
+      }
+
+      ctx.fillStyle = '#ffffff';
+      for (const star of stars) {
+        star.y += star.speed;
+        if (star.y > canvas.height) {
+          star.y = -2;
+          star.x = Math.random() * canvas.width;
+        }
+        ctx.fillRect(star.x, star.y, star.size, star.size);
+      }
+
       if (keys.ArrowLeft && player.x > 0) player.x -= player.speed;
       if (keys.ArrowRight && player.x + player.width < canvas.width) player.x += player.speed;
+
+      if ((keys.ArrowLeft || keys.ArrowRight) && frameCount % 3 === 0) {
+        burst(player.x + 15, player.y + 30, '#00ccff', 1, 1.5);
+      }
 
       ctx.fillStyle = '#00ff00';
       ctx.beginPath();
@@ -129,6 +201,9 @@ export default function EscapePod({ onWin }: EscapePodProps) {
           player.height + player.y > ast.y
         ) {
           isRunning = false;
+          burst(player.x + 15, player.y + 15, '#ff6600', 24, 4);
+          burst(player.x + 15, player.y + 15, '#ffff00', 12, 3);
+          shake = 14;
           playSfx('explode');
           setGameState('GAME_OVER');
           return;
@@ -152,6 +227,9 @@ export default function EscapePod({ onWin }: EscapePodProps) {
           ) {
             asteroids.splice(aIndex, 1);
             bullets.splice(bIndex, 1);
+            burst(ast.x + 15, ast.y + 15, '#ff3300', 14, 3);
+            burst(ast.x + 15, ast.y + 15, '#ffffff', 5, 2);
+            shake = 6;
             playSfx('explode');
             break;
           }
@@ -160,6 +238,19 @@ export default function EscapePod({ onWin }: EscapePodProps) {
 
       bullets = bullets.filter((b) => b.y > 0);
       asteroids = asteroids.filter((a) => a.y < canvas.height);
+
+      particles = particles.filter((p) => p.life > 0);
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 1;
+        ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.restore();
 
       if (isRunning) {
         animationFrameId = requestAnimationFrame(update);

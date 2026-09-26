@@ -36,7 +36,6 @@ export default function VictoryScreen({
 }: VictoryScreenProps) {
   const [initials, setInitials] = React.useState<string>('');
   const [submitted, setSubmitted] = React.useState<boolean>(false);
-  const [submitError, setSubmitError] = React.useState<string | null>(null);
   const submitRun = useMutation(api.runs.submitRun);
   const topRuns = useQuery(api.runs.topRuns);
 
@@ -60,13 +59,11 @@ export default function VictoryScreen({
     if (submitted) return;
     const clean = initials.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 3);
     if (clean.length === 0) {
-      setSubmitError('ENTER 3 INITIALS');
       return;
     }
-    setSubmitError(null);
     submitRun({ initials: clean, durationMs, skipped })
       .then(() => setSubmitted(true))
-      .catch(() => setSubmitError('UPLINK FAILED — BACKEND OFFLINE?'));
+      .catch(() => {});
   };
 
   return (
@@ -79,9 +76,6 @@ export default function VictoryScreen({
           className="w-3/4 select-none"
           style={{ imageRendering: 'pixelated' }}
         />
-        <p className="font-mono text-[11px] uppercase tracking-[0.35em] text-emerald-400">
-          Signal reached
-        </p>
         <h2 className="font-mono text-3xl font-bold uppercase tracking-widest text-zinc-100">
           Escaped
         </h2>
@@ -91,9 +85,6 @@ export default function VictoryScreen({
         </p>
 
         <div className="flex w-full items-center justify-between border border-zinc-800 bg-black px-4 py-3">
-          <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-zinc-500">
-            Run time
-          </span>
           <span className="font-mono text-2xl font-bold text-yellow-400">
             {formatDuration(durationMs)}
           </span>
@@ -109,41 +100,30 @@ export default function VictoryScreen({
           </p>
         )}
 
-        {submitted ? (
-          <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-emerald-400">
-            Logged to leaderboard
-          </p>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex w-full gap-2">
-            <input
-              type="text"
-              value={initials}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setInitials(
-                  e.target.value
-                    .toUpperCase()
-                    .replace(/[^A-Z0-9]/g, '')
-                    .slice(0, 3),
-                )
-              }
-              placeholder="ABC"
-              aria-label="Leaderboard initials"
-              autoComplete="off"
-              className="w-20 border-2 border-zinc-700 bg-black px-3 py-2 text-center font-mono text-xl font-bold uppercase tracking-[0.3em] text-yellow-400 outline-none focus:border-yellow-400 placeholder:text-zinc-700"
-            />
-            <button
-              type="submit"
-              className="pixel-btn flex-1 px-4 py-2 font-mono text-sm font-bold uppercase tracking-widest text-black"
-            >
-              Log run
-            </button>
-          </form>
-        )}
-        {submitError !== null && (
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-red-500">
-            {submitError}
-          </p>
-        )}
+        <form onSubmit={handleSubmit} className="flex w-full gap-2">
+          <input
+            type="text"
+            value={initials}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setInitials(
+                e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Z0-9]/g, '')
+                  .slice(0, 3),
+              )
+            }
+            placeholder="ABC"
+            aria-label="Leaderboard initials"
+            autoComplete="off"
+            className="w-20 border-2 border-zinc-700 bg-black px-3 py-2 text-center font-mono text-xl font-bold uppercase tracking-[0.3em] text-yellow-400 outline-none focus:border-yellow-400 placeholder:text-zinc-700"
+          />
+          <button
+            type="submit"
+            className="pixel-btn flex-1 px-4 py-2 font-mono text-sm font-bold uppercase tracking-widest text-black"
+          >
+            Log run
+          </button>
+        </form>
 
         <div className="w-full border border-zinc-800 bg-black px-4 py-3 text-left">
           <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.25em] text-zinc-500">

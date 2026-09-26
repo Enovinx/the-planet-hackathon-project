@@ -236,3 +236,24 @@
     animation: none;
   }
 }
+
+/* Bridge: pulse the stations that are currently interactive. */
+@keyframes station-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(234, 179, 8, 0);
+  }
+}
+
+.station-ready {
+  animation: station-pulse 1.8s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .station-ready {
+    animation: none;
+  }
+}

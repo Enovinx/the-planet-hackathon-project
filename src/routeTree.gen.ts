@@ -10,18 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AnotherPageRouteImport } from './routes/anotherPage'
 import { Route as ArtRouteImport } from './routes/art'
 import { Route as RepairRouteImport } from './routes/repair'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnotherPageRoute = AnotherPageRouteImport.update({
-  id: '/anotherPage',
-  path: '/anotherPage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArtRoute = ArtRouteImport.update({
@@ -37,34 +31,30 @@ const RepairRoute = RepairRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/anotherPage': typeof AnotherPageRoute
   '/art': typeof ArtRoute
   '/repair': typeof RepairRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/anotherPage': typeof AnotherPageRoute
   '/art': typeof ArtRoute
   '/repair': typeof RepairRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/anotherPage': typeof AnotherPageRoute
   '/art': typeof ArtRoute
   '/repair': typeof RepairRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/anotherPage' | '/art' | '/repair'
+  fullPaths: '/' | '/art' | '/repair'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/anotherPage' | '/art' | '/repair'
-  id: '__root__' | '/' | '/anotherPage' | '/art' | '/repair'
+  to: '/' | '/art' | '/repair'
+  id: '__root__' | '/' | '/art' | '/repair'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AnotherPageRoute: typeof AnotherPageRoute
   ArtRoute: typeof ArtRoute
   RepairRoute: typeof RepairRoute
 }
@@ -76,13 +66,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/anotherPage': {
-      id: '/anotherPage'
-      path: '/anotherPage'
-      fullPath: '/anotherPage'
-      preLoaderRoute: typeof AnotherPageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/art': {
@@ -104,7 +87,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AnotherPageRoute: AnotherPageRoute,
   ArtRoute: ArtRoute,
   RepairRoute: RepairRoute,
 }

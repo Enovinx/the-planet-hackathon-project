@@ -5,27 +5,23 @@
   "type": "module",
   "scripts": {
     "dev": "cmd /k node scripts/dev.mjs",
-    "convex-dev": "convex dev",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run typecheck && vite build",
     "start": "node scripts/node-server.mjs",
     "format": "prettier --write .",
     "lint": "pnpm run typecheck && eslint . --report-unused-disable-directives --max-warnings 0",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@convex-dev/react-query": "^0.1.0",
     "@google/generative-ai": "^0.24.1",
     "@tanstack/react-query": "^5.101.4",
     "@tanstack/react-router": "^1.170.19",
     "@tanstack/react-router-ssr-query": "^1.167.3",
     "@tanstack/react-start": "^1.168.36",
-    "convex": "^1.44.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "@convex-dev/eslint-plugin": "^5.0.0",
     "@edge-runtime/vm": "^5.0.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/eslint-config": "^0.4.0",
@@ -33,7 +29,6 @@
     "@types/react-dom": "^19.2.4",
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitejs/plugin-react": "^6.0.5",
-    "convex-test": "^0.0.60",
     "eslint": "^10.11.0",
     "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3",

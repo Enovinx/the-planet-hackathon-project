@@ -12,7 +12,7 @@ function Home() {
   const [awake, setAwake] = React.useState(false);
 
   return (
-    <main className="relative min-h-screen w-full bg-black text-zinc-200">
+    <main className="relative min-h-screen w-screen overflow-hidden bg-black">
       <AirlockLights>
         <AirlockRoom />
       </AirlockLights>

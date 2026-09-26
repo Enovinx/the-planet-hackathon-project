@@ -194,14 +194,14 @@ export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
 
 const CSS = `
 .kpm-wrap {
-  --kpm-hull: #050505;
-  --kpm-panel: #0f0505;
-  --kpm-rivet: #dc2626;
-  --kpm-text: #ef4444;
-  --kpm-muted: #fca5a5;
-  --kpm-accent: #fbbf24;
-  --kpm-accent-dim: #b45309;
-  --kpm-bad: #ff3b3b;
+  --kpm-hull: #000000;
+  --kpm-panel: #0a0a0a;
+  --kpm-rivet: #ffffff;
+  --kpm-text: #ffffff;
+  --kpm-muted: #a1a1aa;
+  --kpm-accent: #ffffff;
+  --kpm-accent-dim: #71717a;
+  --kpm-bad: #52525b;
   min-height: 100%;
   width: 100%;
   display: flex;
@@ -223,14 +223,11 @@ const CSS = `
   border-radius: 0px;
   padding: 26px 22px 22px;
   position: relative;
-  box-shadow: 0 0 50px rgba(255, 0, 0, 0.25);
+  box-shadow: 8px 8px 0 #ffffff;
 }
 .kpm-card::before,
 .kpm-card::after {
-  content: "";
-  position: absolute;
-  width: 0;
-  height: 0;
+  content: none;
 }
 
 .kpm-header {
@@ -249,7 +246,6 @@ const CSS = `
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--kpm-text);
-  text-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
 }
 .kpm-tier {
   font-size: 14px;
@@ -300,19 +296,17 @@ const CSS = `
 .kpm-key--lit {
   background: var(--kpm-accent);
   border-color: var(--kpm-accent);
-  color: #1a1104;
-  box-shadow: 0 0 18px rgba(251, 191, 36, 0.5);
+  color: #000000;
 }
 .kpm-key--good {
-  background: #166534;
-  border-color: #22c55e;
-  color: #4ade80;
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
 }
 .kpm-key--bad {
-  background: #450a0a;
+  background: #000000;
   border-color: var(--kpm-bad);
-  color: #f87171;
-  box-shadow: 0 0 18px rgba(255, 59, 59, 0.5);
+  color: #a1a1aa;
 }
 
 .kpm-controls {
@@ -337,7 +331,7 @@ const CSS = `
 .kpm-btn--primary {
   background: var(--kpm-accent);
   border-color: var(--kpm-accent);
-  color: #1a1104;
+  color: #000000;
 }
 .kpm-btn--ghost {
   color: var(--kpm-muted);

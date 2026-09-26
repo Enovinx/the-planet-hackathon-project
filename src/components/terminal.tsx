@@ -314,21 +314,21 @@ export default function Terminal({ onCrash }: TerminalProps) {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-black p-4 font-mono text-red-500 md:p-8">
-      <div className="mb-4 flex w-full max-w-3xl items-center justify-between border-b-2 border-red-700 pb-2">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-black p-4 font-mono text-zinc-100 md:p-8">
+      <div className="mb-4 flex w-full max-w-3xl items-center justify-between border-b-2 border-zinc-700 pb-2">
         <div className="flex items-center gap-3">
-          <div className="h-4 w-4 animate-ping rounded-full bg-red-600" />
-          <span className="text-xl font-bold tracking-widest text-red-500">
-            GPT-9000 INTERFACE
+          <div className="h-4 w-4 animate-ping rounded-full bg-white" />
+          <span className="text-xl font-bold tracking-widest text-zinc-100">
+            GPT-9000
           </span>
         </div>
-        <div className="text-xl font-bold tracking-wider text-yellow-500">
+        <div className="text-xl font-bold tracking-wider text-zinc-100">
           PURGE IN:{' '}
           <span
             className={
               secondsRemaining < 30
-                ? 'animate-pulse text-red-600'
-                : 'text-yellow-400'
+                ? 'animate-pulse bg-white px-2 text-black'
+                : 'text-zinc-100'
             }
           >
             {formatTimer(secondsRemaining)}
@@ -336,7 +336,7 @@ export default function Terminal({ onCrash }: TerminalProps) {
         </div>
       </div>
 
-      <div className="flex h-[520px] w-full max-w-3xl flex-col border-4 border-red-800 bg-zinc-950 p-6 shadow-[10px_10px_0px_rgba(153,27,27,1)]">
+      <div className="flex h-[520px] w-full max-w-3xl flex-col border-4 border-white bg-zinc-950 p-6 shadow-[8px_8px_0px_#ffffff]">
         <div className="flex-1 space-y-4 overflow-y-auto pr-3">
           {chatLog.map((entry, idx) => (
             <div
@@ -346,8 +346,8 @@ export default function Terminal({ onCrash }: TerminalProps) {
               <span
                 className={`inline-block border px-3 py-2 ${
                   entry.sender === 'USER'
-                    ? 'border-yellow-600 bg-yellow-950/20 font-bold text-yellow-400'
-                    : 'whitespace-pre-wrap border-red-900 bg-red-950/30 text-red-300'
+                    ? 'border-zinc-400 bg-zinc-900 font-bold text-zinc-100'
+                    : 'whitespace-pre-wrap border-zinc-700 bg-black text-zinc-300'
                 }`}
               >
                 {entry.text}
@@ -359,7 +359,7 @@ export default function Terminal({ onCrash }: TerminalProps) {
 
         <form
           onSubmit={(e) => void handleSubmit(e)}
-          className="mt-4 flex gap-3 border-t-2 border-red-900 pt-3"
+          className="mt-4 flex gap-3 border-t-2 border-zinc-800 pt-3"
         >
           <input
             type="text"
@@ -370,19 +370,19 @@ export default function Terminal({ onCrash }: TerminalProps) {
             disabled={isTyping || secondsRemaining === 0}
             placeholder={
               isTyping
-                ? 'PROCESSING LOGIC GATES...'
-                : 'Type command (e.g. Open the pod bay doors, GPT.)...'
+                ? 'PROCESSING...'
+                : 'Type command...'
             }
-            className="flex-1 border-2 border-red-700 bg-black px-4 py-2 text-red-400 outline-none focus:border-red-400 disabled:opacity-40"
+            className="flex-1 border-2 border-zinc-600 bg-black px-4 py-2 text-zinc-100 outline-none focus:border-white disabled:opacity-40"
             autoComplete="off"
             autoFocus
           />
           <button
             type="submit"
             disabled={isTyping || secondsRemaining === 0}
-            className="bg-red-800 px-6 py-2 font-extrabold uppercase tracking-wider text-black transition-all hover:bg-red-600 disabled:opacity-40"
+            className="bg-white px-6 py-2 font-extrabold uppercase tracking-wider text-black transition-all hover:bg-zinc-300 disabled:opacity-40"
           >
-            Transmit
+            Send
           </button>
         </form>
       </div>

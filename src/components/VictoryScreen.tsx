@@ -66,12 +66,12 @@ export default function VictoryScreen({
     setSubmitError(null);
     submitRun({ initials: clean, durationMs, skipped })
       .then(() => setSubmitted(true))
-      .catch(() => setSubmitError('UPLINK FAILED — BACKEND OFFLINE?'));
+      .catch(() => setSubmitError('UPLINK FAILED: BACKEND OFFLINE'));
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black p-6">
-      <div className="flex w-full max-w-md flex-col items-center gap-5 border-2 border-emerald-400 bg-zinc-950 px-8 py-10 text-center shadow-[10px_10px_0px_rgba(52,211,153,1)]">
+      <div className="flex w-full max-w-md flex-col items-center gap-5 border-2 border-white bg-zinc-950 px-8 py-10 text-center shadow-[8px_8px_0px_#ffffff]">
         <img
           src="/assets/ship/Main%20Ship%20-%20Base%20-%20Full%20health.png"
           alt="Restored ship"
@@ -79,9 +79,6 @@ export default function VictoryScreen({
           className="w-3/4 select-none"
           style={{ imageRendering: 'pixelated' }}
         />
-        <p className="font-mono text-[11px] uppercase tracking-[0.35em] text-emerald-400">
-          Signal reached
-        </p>
         <h2 className="font-mono text-3xl font-bold uppercase tracking-widest text-zinc-100">
           Escaped
         </h2>
@@ -94,12 +91,12 @@ export default function VictoryScreen({
           <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-zinc-500">
             Run time
           </span>
-          <span className="font-mono text-2xl font-bold text-yellow-400">
+          <span className="font-mono text-2xl font-bold text-zinc-100">
             {formatDuration(durationMs)}
           </span>
         </div>
         {isNewBest && (
-          <p className="animate-pulse font-mono text-xs font-bold uppercase tracking-[0.25em] text-emerald-400">
+          <p className="animate-pulse font-mono text-xs font-bold uppercase tracking-[0.25em] text-zinc-100">
             New best
           </p>
         )}
@@ -110,7 +107,7 @@ export default function VictoryScreen({
         )}
 
         {submitted ? (
-          <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-emerald-400">
+          <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-zinc-100">
             Logged to leaderboard
           </p>
         ) : (
@@ -129,18 +126,18 @@ export default function VictoryScreen({
               placeholder="ABC"
               aria-label="Leaderboard initials"
               autoComplete="off"
-              className="w-20 border-2 border-zinc-700 bg-black px-3 py-2 text-center font-mono text-xl font-bold uppercase tracking-[0.3em] text-yellow-400 outline-none focus:border-yellow-400 placeholder:text-zinc-700"
+              className="w-20 border-2 border-zinc-700 bg-black px-3 py-2 text-center font-mono text-xl font-bold uppercase tracking-[0.3em] text-zinc-100 outline-none focus:border-white placeholder:text-zinc-700"
             />
             <button
               type="submit"
-              className="flex-1 border-2 border-yellow-400 bg-yellow-400 px-4 py-2 font-mono text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-yellow-300"
+              className="flex-1 border-2 border-white bg-white px-4 py-2 font-mono text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-zinc-300"
             >
               Log run
             </button>
           </form>
         )}
         {submitError !== null && (
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-red-500">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-100">
             {submitError}
           </p>
         )}
@@ -155,7 +152,7 @@ export default function VictoryScreen({
             </p>
           ) : topRuns.length === 0 ? (
             <p className="font-mono text-xs text-zinc-600">
-              NO RUNS LOGGED — BE THE FIRST
+              NO RUNS LOGGED: BE THE FIRST
             </p>
           ) : (
             <ol className="space-y-1">
@@ -167,7 +164,7 @@ export default function VictoryScreen({
                   <span className="text-zinc-400">
                     {i + 1}. {run.initials}
                   </span>
-                  <span className="font-bold text-yellow-400">
+                  <span className="font-bold text-zinc-100">
                     {formatDuration(run.durationMs)}
                   </span>
                 </li>
@@ -179,7 +176,7 @@ export default function VictoryScreen({
         <button
           type="button"
           onClick={onRestart}
-          className="mt-2 border-2 border-emerald-400 bg-emerald-400 px-6 py-3 font-mono text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-emerald-300"
+          className="mt-2 border-2 border-white bg-white px-6 py-3 font-mono text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-zinc-300"
         >
           Play again
         </button>

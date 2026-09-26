@@ -56,7 +56,7 @@ export default function AirlockLights({
               onClick={turnOnLights}
               aria-label="Turn on the lights"
               style={switchPosition}
-              className="airlock-switch absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-sm border border-yellow-500/40 bg-zinc-950/70 text-yellow-500/70 transition-all duration-200 hover:scale-110 hover:border-yellow-400 hover:text-yellow-400 active:scale-95"
+              className="airlock-switch absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-sm border border-white/40 bg-zinc-950/70 text-zinc-300 transition-all duration-200 hover:scale-110 hover:border-white hover:text-white active:scale-95"
             >
               <svg
                 width="20"

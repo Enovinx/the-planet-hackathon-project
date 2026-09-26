@@ -17,10 +17,10 @@ interface PairStyle {
 }
 
 export const PAIR_STYLES: PairStyle[] = [
-  { main: '#22d3ee', soft: 'rgba(34,211,238,0.22)' },
-  { main: '#fbbf24', soft: 'rgba(251,191,36,0.22)' },
-  { main: '#a3e635', soft: 'rgba(163,230,53,0.22)' },
-  { main: '#f472b6', soft: 'rgba(244,114,182,0.22)' },
+  { main: '#ffffff', soft: 'rgba(255,255,255,0.22)' },
+  { main: '#d4d4d8', soft: 'rgba(212,212,216,0.22)' },
+  { main: '#a1a1aa', soft: 'rgba(161,161,170,0.22)' },
+  { main: '#71717a', soft: 'rgba(113,113,122,0.22)' },
 ];
 
 const BOUNCE = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
@@ -305,8 +305,8 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
               aria-label={locked[i] === true ? 'linked' : 'unlinked'}
               className={
                 locked[i] === true
-                  ? 'inline-block w-4 h-4 rounded-full animate-[gr-dot-pop_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards]'
-                  : 'inline-block w-4 h-4 rounded-full transition-all duration-300'
+                  ? 'inline-block w-4 h-4 animate-[gr-dot-pop_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards]'
+                  : 'inline-block w-4 h-4 transition-all duration-300'
               }
               style={{
                 background: locked[i] === true ? s.main : 'transparent',
@@ -343,7 +343,7 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
             type="button"
             onClick={newPuzzle}
             aria-label="new"
-            className="w-9 h-9 flex items-center justify-center rounded bg-red-700 text-white hover:bg-red-600 hover:scale-105 active:scale-90 transition-all duration-200"
+            className="w-9 h-9 flex items-center justify-center rounded bg-white text-black hover:bg-zinc-300 hover:scale-105 active:scale-90 transition-all duration-200"
             style={{ transitionTimingFunction: BOUNCE }}
           >
             <svg
@@ -366,12 +366,12 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
 
       <div className="relative">
         <div
-          className="relative rounded-xl border-2 bg-zinc-950 p-2 transition-colors duration-500"
-          style={{ borderColor: solved ? '#a3e635' : 'rgb(63 63 70)' }}
+          className="relative border-2 bg-zinc-950 p-2 transition-colors duration-500"
+          style={{ borderColor: solved ? '#ffffff' : 'rgb(63 63 70)' }}
         >
           <div
             key={puzzleId}
-            className="relative aspect-square w-full grid touch-none rounded-lg overflow-hidden"
+            className="relative aspect-square w-full grid touch-none overflow-hidden"
             style={{
               gridTemplateRows: `repeat(${GRID_SIZE}, minmax(0,1fr))`,
               gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0,1fr))`,
@@ -422,15 +422,18 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
                 >
                   {ep !== null && (
                     <span
-                      className="w-[62%] h-[62%] rounded-full z-10 pointer-events-none animate-[gr-node-pop_0.45s_cubic-bezier(0.34,1.56,0.64,1)_backwards] transition-transform duration-200"
+                      className="w-[62%] h-[62%] z-10 pointer-events-none flex items-center justify-center font-mono text-xs font-bold animate-[gr-node-pop_0.45s_cubic-bezier(0.34,1.56,0.64,1)_backwards] transition-transform duration-200"
                       style={{
                         background: (PAIR_STYLES[ep] as PairStyle).main,
                         border: '2px solid rgba(0,0,0,0.6)',
+                        color: '#000000',
                         animationDelay: `${epIndex * 55}ms`,
                         transform:
                           locked[ep] === true ? 'scale(1.12)' : undefined,
                       }}
-                    />
+                    >
+                      {ep + 1}
+                    </span>
                   )}
                 </div>
               );
@@ -475,22 +478,22 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
             <div
               ref={glowRef}
               aria-hidden="true"
-              className="absolute top-0 left-0 w-[12.5%] h-[12.5%] rounded-full pointer-events-none opacity-0"
+              className="absolute top-0 left-0 w-[12.5%] h-[12.5%] pointer-events-none opacity-0"
               style={{ willChange: 'transform, opacity' }}
             >
-              <div className="absolute inset-[22%] rounded-full bg-white/90" />
+              <div className="absolute inset-[22%] bg-white/90" />
             </div>
           </div>
 
           {solved && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-xl">
-              <div className="flex flex-col items-center gap-4 border-2 border-lime-400 bg-zinc-950 px-8 py-6 animate-[gr-overlay-in_0.5s_cubic-bezier(0.34,1.56,0.64,1)_backwards]">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+              <div className="flex flex-col items-center gap-4 border-2 border-white bg-zinc-950 px-8 py-6 animate-[gr-overlay-in_0.5s_cubic-bezier(0.34,1.56,0.64,1)_backwards]">
                 <svg
                   width="40"
                   height="40"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#a3e635"
+                  stroke="#ffffff"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -507,7 +510,7 @@ export default function GeneratorRepairPuzzle({ seed, onSolved }: Props) {
                   type="button"
                   onClick={newPuzzle}
                   aria-label="next"
-                  className="w-11 h-11 flex items-center justify-center rounded bg-lime-400 text-black hover:bg-lime-300 hover:scale-110 active:scale-90 transition-all duration-200"
+                  className="w-11 h-11 flex items-center justify-center rounded bg-white text-black hover:bg-zinc-300 hover:scale-110 active:scale-90 transition-all duration-200"
                   style={{ transitionTimingFunction: BOUNCE }}
                 >
                   <svg

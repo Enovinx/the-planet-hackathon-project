@@ -191,12 +191,12 @@ export default function AirlockRoom() {
             {STEP_ORDER.map((flag, index) => (
               <span
                 key={flag}
-                className="block h-2 w-2 rounded-full border border-black/60"
+                className="block h-2 w-2 border border-black/60"
                 style={{
                   background: progress[flag]
-                    ? '#4ade80'
+                    ? '#ffffff'
                     : index === completedSteps
-                      ? '#eab308'
+                      ? '#71717a'
                       : '#27272a',
                 }}
               />
@@ -215,16 +215,16 @@ export default function AirlockRoom() {
             style={station.rect}
             className={`group absolute rounded-sm border-2 transition-colors duration-200 focus:outline-none ${
               station.done
-                ? 'border-emerald-400/70 bg-emerald-400/5'
+                ? 'border-white/70 bg-white/5'
                 : station.unlocked
-                  ? 'station-ready cursor-pointer border-yellow-400/60 bg-yellow-400/5 hover:bg-yellow-400/25'
+                  ? 'station-ready cursor-pointer border-white/60 bg-white/5 hover:bg-white/25'
                   : 'cursor-not-allowed border-zinc-500/20 bg-black/25'
             }`}
           >
             <span
               className={`pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-sm border px-2 py-1 font-mono text-sm uppercase tracking-[0.2em] transition-opacity duration-150 ${
                 station.unlocked
-                  ? 'border-yellow-400/40 bg-black/85 text-yellow-300 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
+                  ? 'border-white/40 bg-black/85 text-zinc-100 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
                   : 'border-zinc-600/40 bg-black/85 text-zinc-500 opacity-0 group-hover:opacity-100'
               }`}
             >
@@ -237,7 +237,7 @@ export default function AirlockRoom() {
           <div
             role="status"
             aria-live="polite"
-            className="pointer-events-none absolute bottom-[3%] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-yellow-400/40 bg-black/85 px-4 py-1.5 font-mono text-sm uppercase tracking-[0.2em] text-yellow-300"
+            className="pointer-events-none absolute bottom-[3%] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-white/40 bg-black/85 px-4 py-1.5 font-mono text-sm uppercase tracking-[0.2em] text-zinc-100"
           >
             {notice}
           </div>

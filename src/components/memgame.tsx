@@ -15,8 +15,12 @@ interface FlashKeyState {
   correct: boolean;
 }
 
+interface KeypadMemoryGameProps {
+  onWin?: () => void;
+}
+
 // idle -> showing -> input -> (success -> showing | fail -> idle) -> won
-export default function KeypadMemoryGame() {
+export default function KeypadMemoryGame({ onWin }: KeypadMemoryGameProps) {
   const [status, setStatus] = useState<GameStatus>("idle");
   const [sequence, setSequence] = useState<GameKey[]>([]);
   const [inputIndex, setInputIndex] = useState<number>(0);
@@ -85,6 +89,7 @@ export default function KeypadMemoryGame() {
       if (sequence.length === MAX_LENGTH) {
         setStatus("won");
         setBest(MAX_LENGTH);
+        onWin?.();
       } else {
         setStatus("success");
         nextLevel(sequence);

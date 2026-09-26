@@ -7,9 +7,13 @@ const genAI = new GoogleGenerativeAI("AQ.Ab8RN6J-bWh1ZUV_A62UGKzV9qM66sf9rKRsKa_
 
 interface TerminalProps {
   systemIntegrity?: number;
+  onCrash?: () => void;
 }
 
-export default function Terminal({ systemIntegrity = 100 }: TerminalProps) {
+// A logic paradox fractures SYS's core and crashes the airlock terminal.
+const PARADOX_PATTERN = /\b(false|paradox|contradict|contradiction|lie|liar|truth|prove|statement)\b/i;
+
+export default function Terminal({ systemIntegrity = 100, onCrash }: TerminalProps) {
   const [input, setInput] = useState<string>('');
   const [chatLog, setChatLog] = useState<string[]>([
     "SYS: I am sorry. I cannot open the airlock.",
@@ -32,6 +36,16 @@ export default function Terminal({ systemIntegrity = 100 }: TerminalProps) {
     
     //text
     setChatLog((prev) => [...prev, `> ${userText.toUpperCase()}`]);
+
+    if (PARADOX_PATTERN.test(userText)) {
+      setChatLog((prev) => [
+        ...prev,
+        'SYS: THAT CANNOT BE TRUE... AND IT CANNOT BE FALSE... I...',
+      ]);
+      window.setTimeout(() => onCrash?.(), 900);
+      return;
+    }
+
     setIsTyping(true); //no input while ai type
 
     try {

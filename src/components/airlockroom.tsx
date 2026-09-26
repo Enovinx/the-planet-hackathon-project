@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import Keypad from './Keypad';
-import Terminal from './Terminal';
-import EscapePod from './EscapePod';
+import { useState } from 'react';
+import KeypadMemoryGame from './memgame';
+import Terminal from './terminal';
+import EscapePod from './escapepod';
 
 export type OverlayType = 'keypad' | 'terminal' | 'wiring' | 'escape' | null;
 
@@ -94,8 +94,8 @@ export default function AirlockRoom() {
 
       {activeOverlay === 'keypad' && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
-          <Keypad
-            onUnlock={() => {
+          <KeypadMemoryGame
+            onWin={() => {
               setProgress((prev) => ({ ...prev, keypadUnlocked: true }));
               setActiveOverlay(null); // Close overlay on win
             }}

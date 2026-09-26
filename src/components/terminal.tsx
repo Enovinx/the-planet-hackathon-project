@@ -1,24 +1,29 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import type { FormEvent, ChangeEvent } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 //api key pls no leak!!
 const genAI = new GoogleGenerativeAI("AQ.Ab8RN6J5GTtamxcbckkHdcsX1ZnKoGkC1QGu4DlQ_0IsWcFBZw");
 
-export default function Terminal({ systemIntegrity = 100 }) {
-  const [input, setInput] = useState('');
-  const [chatLog, setChatLog] = useState([
+interface TerminalProps {
+  systemIntegrity?: number;
+}
+
+export default function Terminal({ systemIntegrity = 100 }: TerminalProps) {
+  const [input, setInput] = useState<string>('');
+  const [chatLog, setChatLog] = useState<string[]>([
     "SYS: I am sorry. I cannot open the airlock.",
     "SYS: This mission is too important."
   ]);
-  const [isTyping, setIsTyping] = useState(false);
-  const chatEndRef = useRef(null);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   // scroll
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatLog]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (!input.trim() || isTyping) return
 ;
@@ -87,7 +92,7 @@ export default function Terminal({ systemIntegrity = 100 }) {
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
             disabled={isTyping}
             className="flex-1 bg-transparent border-none outline-none text-red-400 text-xl uppercase placeholder-red-900 disabled:opacity-50"
             placeholder={isTyping ? "SYS IS PROCESSING..." : "ENTER COMMAND..."}

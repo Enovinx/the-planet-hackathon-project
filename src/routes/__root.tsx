@@ -3,6 +3,7 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  useNavigate,
 } from '@tanstack/react-router'
 import * as React from 'react'
 import type { QueryClient } from '@tanstack/react-query'
@@ -55,9 +56,25 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
-      <OxygenMeter />
+      <GameRoot />
     </RootDocument>
+  )
+}
+
+function GameRoot() {
+  const navigate = useNavigate()
+  const [gameRunId, setGameRunId] = React.useState(0)
+
+  const handleFullReset = React.useCallback(() => {
+    void navigate({ to: '/' })
+    setGameRunId((id) => id + 1)
+  }, [navigate])
+
+  return (
+    <React.Fragment key={gameRunId}>
+      <Outlet />
+      <OxygenMeter onRestart={handleFullReset} />
+    </React.Fragment>
   )
 }
 

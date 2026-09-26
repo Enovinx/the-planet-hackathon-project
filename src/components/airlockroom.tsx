@@ -4,7 +4,6 @@ import Terminal from './terminal';
 import EscapePod from './escapepod';
 import GeneratorRepairPuzzle from './GeneratorRepairPuzzle';
 import WiringPuzzle from './WiringPuzzle';
-import SoundToggle from './SoundToggle';
 import VictoryScreen from './VictoryScreen';
 
 type OverlayType =

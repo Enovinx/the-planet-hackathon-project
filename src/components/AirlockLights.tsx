@@ -22,7 +22,15 @@ export default function AirlockLights({
 }: AirlockLightsProps) {
   const [lightsOn, setLightsOn] = React.useState(false);
   const [darknessGone, setDarknessGone] = React.useState(false);
-  const [switchPosition] = React.useState(randomSwitchPosition);
+  const [switchPosition, setSwitchPosition] = React.useState<React.CSSProperties>({
+    top: '50%',
+    left: '50%',
+  });
+
+  // Randomize on the client only so SSR and first paint agree.
+  React.useEffect(() => {
+    setSwitchPosition(randomSwitchPosition());
+  }, []);
 
   const turnOnLights = React.useCallback(() => {
     setLightsOn((prev) => {

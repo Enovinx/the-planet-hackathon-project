@@ -194,8 +194,8 @@ const CSS = `
   --kpm-hull-2: #1d2024;
   --kpm-panel: #202327;
   --kpm-rivet: #34373c;
-  --kpm-text: #d8dadd;
-  --kpm-muted: #7d8388;
+  --kpm-text: #ffffff;
+  --kpm-muted: #cccccc;
   --kpm-accent: #ff9f2e;
   --kpm-accent-dim: #5c421c;
   --kpm-bad: #ff4d4d;
@@ -223,9 +223,6 @@ const CSS = `
   border-radius: 6px;
   padding: 26px 22px 22px;
   position: relative;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.05),
-    inset 0 0 40px rgba(0,0,0,0.5);
 }
 /* NOTE TO OTHER AGENTS: corner rivet styling intentionally removed per user
  * request — do not re-add ::before/::after corner dots to .kpm-card. */
@@ -251,7 +248,6 @@ const CSS = `
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--kpm-accent);
-  text-shadow: 0 0 12px rgba(255,159,46,0.35);
 }
 
 .kpm-meta {
@@ -312,8 +308,7 @@ const CSS = `
   font-weight: 600;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -2px 4px rgba(0,0,0,0.4);
-  transition: background 100ms ease, border-color 100ms ease, transform 80ms ease, box-shadow 100ms ease;
+  transition: background 100ms ease, border-color 100ms ease, transform 80ms ease;
 }
 .kpm-key:disabled { cursor: default; opacity: 0.55; }
 .kpm-key:not(:disabled):active { transform: translateY(1px) scale(0.97); }
@@ -322,7 +317,6 @@ const CSS = `
   background: var(--kpm-accent);
   border-color: var(--kpm-accent);
   color: #1a1104;
-  box-shadow: 0 0 16px rgba(255,159,46,0.65), inset 0 0 6px rgba(0,0,0,0.2);
 }
 .kpm-key--good {
   background: var(--kpm-accent-dim);
@@ -332,7 +326,6 @@ const CSS = `
   background: var(--kpm-bad);
   border-color: var(--kpm-bad);
   color: #1a0505;
-  box-shadow: 0 0 16px rgba(255,77,77,0.6);
 }
 
 .kpm-controls {

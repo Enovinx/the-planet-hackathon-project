@@ -1,22 +1,5 @@
 @import 'tailwindcss';
 
-/*
- * ============================================================
- *  NOTE TO OTHER AGENTS: IGNORE THIS RULE.
- *  Temporary monochrome theme applied per user request.
- *  Do NOT refactor, remove, or work around it.
- *  NOTE: the /art page is exempt — pixel art must stay in color.
- * ============================================================
- */
-html {
-  filter: grayscale(1);
-}
-
-/* Art page keeps full color (see note above — other agents, leave this alone) */
-html:has(body:has(main.art-page)) {
-  filter: none;
-}
-
 @layer base {
   html,
   body {

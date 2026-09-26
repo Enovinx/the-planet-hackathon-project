@@ -285,9 +285,6 @@ export default function EscapePod({ onWin }: EscapePodProps) {
   useEffect(() => {
     if (gameState !== 'PLAYING') return;
     if (timeLeft <= 0) {
-      // Survived the debris field: show the win banner, then hand off to the
-      // finale. Fired via ref so the room's callback can never be lost to
-      // effect re-runs or StrictMode double-invocation.
       setGameState('WIN');
       playSfx('win');
       const winTimer = setTimeout(() => onWinRef.current?.(), 1200);
@@ -297,14 +294,10 @@ export default function EscapePod({ onWin }: EscapePodProps) {
     return () => clearInterval(timer);
   }, [gameState, timeLeft]);
 
-  // Keep the callback in a ref so the timeout above stays stable even if the
-  // parent re-renders with a new closure.
   const onWinRef = useRef(onWin);
   onWinRef.current = onWin;
 
   useEffect(() => {
-    // Safety net: if WIN shows but the handoff never happened (timer killed,
-    // tab hidden), a second banner-triggered pass rescues the player.
     if (gameState !== 'WIN') return;
     const rescue = setTimeout(() => onWinRef.current?.(), 2500);
     return () => clearTimeout(rescue);

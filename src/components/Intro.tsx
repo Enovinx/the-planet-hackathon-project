@@ -1,15 +1,5 @@
 import * as React from 'react';
 
-/**
- * Cold-open title sequence for the lost-astronaut campaign.
- *
- * 1. A black screen cycles through a few sets of minimal, fading text.
- * 2. The screen "blinks": two black eyelids part from the centre, opening the
- *    player's eyes onto the world behind the intro.
- *
- * Click anywhere (or press any key) to skip. Calls `onComplete` when the eyes
- * are open and the intro has unmounted.
- */
 
 const LINES: string[] = [
   'CRYO POD 07 — THAW COMPLETE',
@@ -40,7 +30,6 @@ export default function Intro({ onComplete }: IntroProps) {
     onComplete?.();
   }, [onComplete]);
 
-  // Advance the text one line at a time, then start the blink.
   React.useEffect(() => {
     if (phase !== 'text') return;
     const isLast = lineIndex >= LINES.length - 1;
@@ -51,14 +40,12 @@ export default function Intro({ onComplete }: IntroProps) {
     return () => window.clearTimeout(timer);
   }, [phase, lineIndex]);
 
-  // The eyelids part, then the intro releases the screen.
   React.useEffect(() => {
     if (phase !== 'blink') return;
     const timer = window.setTimeout(complete, BLINK_MS);
     return () => window.clearTimeout(timer);
   }, [phase, complete]);
 
-  // Skip on any key press.
   React.useEffect(() => {
     if (phase === 'done') return;
     const onKey = () => complete();

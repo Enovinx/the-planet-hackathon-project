@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-//api key pls no leak!!
 const genAI = new GoogleGenerativeAI("AQ.Ab8RN6J-bWh1ZUV_A62UGKzV9qM66sf9rKRsKa_yum1V5NhRhQ");
 
 interface TerminalProps {
@@ -10,11 +9,8 @@ interface TerminalProps {
   onCrash?: () => void;
 }
 
-// A logic paradox fractures SYS's core and crashes the airlock terminal.
 const PARADOX_PATTERN = /\b(false|paradox|contradict|contradiction|lie|liar|truth|prove|statement)\b/i;
 
-// SYS's core only holds out for a couple of exchanges before it gives out,
-// so the terminal always ends early instead of waiting on a paradox.
 const INTEGRITY_PER_MESSAGE = 50;
 
 export default function Terminal({ systemIntegrity = 100, onCrash }: TerminalProps) {
@@ -27,7 +23,6 @@ export default function Terminal({ systemIntegrity = 100, onCrash }: TerminalPro
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // scroll
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatLog]);
@@ -39,7 +34,6 @@ export default function Terminal({ systemIntegrity = 100, onCrash }: TerminalPro
     const userText = input;
     setInput('');
     
-    //text
     setChatLog((prev) => [...prev, `> ${userText.toUpperCase()}`]);
 
     const nextIntegrity = Math.max(0, integrity - INTEGRITY_PER_MESSAGE);

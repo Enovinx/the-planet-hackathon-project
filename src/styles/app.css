@@ -11,7 +11,6 @@
   }
 }
 
-/* Generator repair puzzle polish: bounce-eased keyframes (lerp/spring feel). */
 @keyframes gr-node-pop {
   0% {
     transform: scale(0);
@@ -64,7 +63,6 @@
   }
 }
 
-/* Lost-astronaut intro: minimal text beats, then an eye-blink reveal. */
 @keyframes intro-line-fade {
   0% {
     opacity: 0;
@@ -118,7 +116,6 @@
   }
 }
 
-/* The two black eyelids overlap slightly so the closed screen has no seam. */
 .intro-eyelid {
   position: absolute;
   left: 0;
@@ -136,7 +133,6 @@
   bottom: 0;
 }
 
-/* Light that floods in through the parting eyelids. */
 .intro-iris {
   position: absolute;
   inset: 0;
@@ -175,7 +171,6 @@
   }
 }
 
-/* Airlock lights: the room starts dark and the switch flickers it on. */
 .airlock-darkness {
   background: #000;
   transition: opacity 300ms ease-out;
@@ -237,7 +232,6 @@
   }
 }
 
-/* Bridge: pulse the stations that are currently interactive. */
 @keyframes station-pulse {
   0%,
   100% {

@@ -12,7 +12,6 @@ type OverlayType =
   | 'escape'
   | null;
 
-/** Story flags, in the order the player is meant to uncover them. */
 interface Progress {
   powerKeys: boolean;
   sysCrashed: boolean;
@@ -23,16 +22,13 @@ interface Progress {
 interface Station {
   id: Exclude<OverlayType, null>;
   label: string;
-  /** Fraction-of-image rectangle over the control panel artwork. */
   rect: { left: string; top: string; width: string; height: string };
   unlocked: boolean;
   done: boolean;
 }
 
-/** Control panel artwork aspect ratio (1761 × 1011). */
 const PANEL_ASPECT = 1761 / 1011;
 
-/** The ship gets healthier as the player brings systems back online. */
 const HULL_STATES = [
   '/assets/ship/Main%20Ship%20-%20Base%20-%20Very%20damaged.png',
   '/assets/ship/Main%20Ship%20-%20Base%20-%20Damaged.png',

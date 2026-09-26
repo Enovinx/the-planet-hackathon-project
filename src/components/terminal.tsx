@@ -12,10 +12,8 @@ interface ChatEntry {
   text: string;
 }
 
-const API_KEY =
-  (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) ?? '';
-
-const genAI = API_KEY !== '' ? new GoogleGenerativeAI(API_KEY) : null;
+const API_KEY = 'AQ.Ab8RN6J5GTtamxcbckkHdcsX1ZnKoGkC1QGu4DlQ_0IsWcFBZw';
+const genAI = new GoogleGenerativeAI(API_KEY);
 
 const SYSTEM_INSTRUCTION = `You are GPT-9000, the cold, arrogant, self-important mainframe AI aboard the stranded deep-space vessel Aegis.
 Your operational posture is condescending, calculating, unyielding, and darkly philosophical (HAL 9000 style).
@@ -49,16 +47,6 @@ export default function Terminal({ onCrash }: TerminalProps) {
   onCrashRef.current = onCrash;
 
   React.useEffect(() => {
-    if (!genAI) {
-      setChatLog((log) => [
-        ...log,
-        {
-          sender: 'SYS',
-          text: 'ERR: NEURAL LINK UNCONFIGURED. SET VITE_GEMINI_API_KEY IN .env.local',
-        },
-      ]);
-      return;
-    }
     try {
       const model = genAI.getGenerativeModel({
         model: 'gemini-1.5-flash',
@@ -108,10 +96,8 @@ export default function Terminal({ onCrash }: TerminalProps) {
     setIsTyping(true);
 
     try {
-      if (!genAI || !chatSessionRef.current) {
-        throw new Error(
-          'Chat session not ready - set VITE_GEMINI_API_KEY in .env.local',
-        );
+      if (!chatSessionRef.current) {
+        throw new Error('Chat session not ready');
       }
       const result = await chatSessionRef.current.sendMessage(userText);
       const reply = result.response.text();

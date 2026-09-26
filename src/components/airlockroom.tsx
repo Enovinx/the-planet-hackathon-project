@@ -117,9 +117,42 @@ export default function AirlockRoom() {
 
   const completedSteps = STEP_ORDER.filter((flag) => progress[flag]).length;
 
+  // Judge failsafes: always clickable above overlays. SKIP advances one
+  // stage, RESET restarts the whole run for the next demo.
+  const skipStage = useCallback(() => {
+    const next = STEP_ORDER.find((flag) => !progress[flag]);
+    if (next) complete(next);
+    setActiveOverlay(null);
+  }, [progress, complete]);
+
+  const resetDemo = useCallback(() => {
+    setProgress(EMPTY_PROGRESS);
+    setEscaped(false);
+    setActiveOverlay(null);
+    setNotice(null);
+  }, []);
+
   return (
     <div className="flex h-full w-full items-center justify-center overflow-hidden bg-black">
       <SoundToggle />
+      <button
+        type="button"
+        onClick={skipStage}
+        aria-label="Skip stage"
+        title="Skip stage"
+        className="fixed left-4 top-4 z-[80] border border-zinc-800 bg-black/70 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600 opacity-40 transition-opacity hover:opacity-100"
+      >
+        Skip
+      </button>
+      <button
+        type="button"
+        onClick={resetDemo}
+        aria-label="Reset demo"
+        title="Reset demo"
+        className="fixed right-16 top-4 z-[80] border border-zinc-800 bg-black/70 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600 opacity-40 transition-opacity hover:opacity-100"
+      >
+        Reset
+      </button>
       <div
         className="relative max-h-screen"
         style={{

@@ -50,14 +50,6 @@ function useStageScale(): number {
   return scale;
 }
 
-const HULL_STATES = [
-  '/assets/ship/Main%20Ship%20-%20Base%20-%20Very%20damaged.png',
-  '/assets/ship/Main%20Ship%20-%20Base%20-%20Damaged.png',
-  '/assets/ship/Main%20Ship%20-%20Base%20-%20Slight%20damage.png',
-  '/assets/ship/Main%20Ship%20-%20Base%20-%20Slight%20damage.png',
-  '/assets/ship/Main%20Ship%20-%20Base%20-%20Full%20health.png',
-];
-
 const STEP_ORDER: (keyof Progress)[] = [
   'powerKeys',
   'sysCrashed',
@@ -137,7 +129,6 @@ export default function AirlockRoom() {
     },
   ];
 
-  const completedSteps = STEP_ORDER.filter((flag) => progress[flag]).length;
   const stageScale = useStageScale();
 
   // The first unfinished stage is the active door the player must enter.

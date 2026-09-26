@@ -9,11 +9,18 @@ function formatPercent(value: number): string {
   return `${Math.ceil(value)}%`;
 }
 
-export default function OxygenMeter() {
+interface OxygenMeterProps {
+  /** Called when the player restarts after oxygen depletion, so the whole game can reset. */
+  onRestart?: () => void;
+}
+
+export default function OxygenMeter({ onRestart }: OxygenMeterProps) {
   const [remaining, setRemaining] = React.useState(START_PERCENT);
   const [dead, setDead] = React.useState(false);
   const [runId, setRunId] = React.useState(0);
   const startedAtRef = React.useRef<number | null>(null);
+  const onRestartRef = React.useRef<OxygenMeterProps['onRestart']>(onRestart);
+  onRestartRef.current = onRestart;
 
   React.useEffect(() => {
     startedAtRef.current = Date.now();
@@ -37,6 +44,7 @@ export default function OxygenMeter() {
 
   const restart = React.useCallback(() => {
     setRunId((id) => id + 1);
+    onRestartRef.current?.();
   }, []);
 
   const low = remaining <= LOW_PERCENT && !dead;

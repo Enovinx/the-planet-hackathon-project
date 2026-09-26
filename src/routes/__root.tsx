@@ -3,6 +3,7 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  useNavigate,
 } from '@tanstack/react-router'
 import * as React from 'react'
 import type { QueryClient } from '@tanstack/react-query'
@@ -55,9 +56,30 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
-      <OxygenMeter />
+      <GameRoot />
     </RootDocument>
+  )
+}
+
+/**
+ * Everything below the document shell. Keyed by `gameRunId` so a restart
+ * remounts the active route and the meter, wiping every piece of game state
+ * (intro, puzzle progress, overlays, timers) for a clean new run.
+ */
+function GameRoot() {
+  const navigate = useNavigate()
+  const [gameRunId, setGameRunId] = React.useState(0)
+
+  const handleFullReset = React.useCallback(() => {
+    void navigate({ to: '/' })
+    setGameRunId((id) => id + 1)
+  }, [navigate])
+
+  return (
+    <React.Fragment key={gameRunId}>
+      <Outlet />
+      <OxygenMeter onRestart={handleFullReset} />
+    </React.Fragment>
   )
 }
 

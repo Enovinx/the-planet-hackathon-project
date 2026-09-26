@@ -29,14 +29,9 @@ interface Station {
   done: boolean;
 }
 
-/* Pixel-art stage: every sprite renders at exactly 15 CSS px per source
-   pixel. The room background (spritepaint 44, 73x79) defines the stage size,
-   and the doors (48, 49) are placed on it at their own native 15x sizes, so
-   all art shares one pixel grid. The stage is uniformly scaled to the
-   viewport, preserving that grid at every window size. */
-const PX = 8; // CSS pixels per source pixel
-const STAGE_W = 73 * PX; // 584 - spritepaint 44 width
-const STAGE_H = 79 * PX; // 632 - spritepaint 44 height
+const PX = 8;
+const STAGE_W = 73 * PX;
+const STAGE_H = 79 * PX;
 
 function useStageScale(): number {
   const [scale, setScale] = useState(1);

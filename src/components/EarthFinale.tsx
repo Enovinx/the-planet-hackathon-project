@@ -2,11 +2,10 @@ import { useEffect, useState } from 'react';
 // NOTE: durationMs/skipped props intentionally unused — stats lines removed per user request.
 
 /**
- * Drop the earth-and-ship artwork at this path when it is uploaded and the
- * finale picks it up automatically. Until then a composed placeholder
- * backdrop (stars + earth disc + ship silhouette) is shown.
+ * End scene artwork. Uses the "end screen" sprite (spritepaint 52.png).
+ * Swap to a dedicated finale image later by changing this path.
  */
-const EARTH_SHIP_SRC = '/assets/finale/earth-ship.png';
+const EARTH_SHIP_SRC = '/assets/spritepaint 52.png';
 
 interface EarthFinaleProps {
   onRestart: () => void;
@@ -33,8 +32,13 @@ export default function EarthFinale({
         <img
           src={EARTH_SHIP_SRC}
           alt="Earth and the escape ship"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ imageRendering: 'pixelated' }}
+          className="absolute inset-0 h-full w-full object-contain"
+          style={{
+            imageRendering: 'pixelated',
+            // Scale the small sprite up crisply; pixelated keeps the pixels sharp.
+            width: '100%',
+            height: '100%',
+          }}
         />
       ) : (
         <div aria-hidden="true" className="absolute inset-0">

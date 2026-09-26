@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { playSfx } from '~/lib/sfx';
 
 /**
  * Cold-open title sequence for the lost-astronaut campaign.
@@ -37,6 +38,7 @@ export default function Intro({ onComplete }: IntroProps) {
 
   const complete = React.useCallback(() => {
     setPhase('done');
+    playSfx('click');
     onComplete?.();
   }, [onComplete]);
 

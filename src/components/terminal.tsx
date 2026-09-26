@@ -1,137 +1,213 @@
-import { useState, useRef, useEffect } from 'react';
-import type { FormEvent, ChangeEvent } from 'react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-//api key pls no leak!!
-const genAI = new GoogleGenerativeAI("AQ.Ab8RN6J-bWh1ZUV_A62UGKzV9qM66sf9rKRsKa_yum1V5NhRhQ");
+import * as React from 'react';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import type { ChatSession } from '@google/generative-ai';
+import { playSfx } from '~/lib/sfx';
 
 interface TerminalProps {
-  systemIntegrity?: number;
   onCrash?: () => void;
 }
 
-// A logic paradox fractures SYS's core and crashes the airlock terminal.
-const PARADOX_PATTERN = /\b(false|paradox|contradict|contradiction|lie|liar|truth|prove|statement)\b/i;
+interface ChatEntry {
+  sender: 'SYS' | 'USER';
+  text: string;
+}
 
-// SYS's core only holds out for a couple of exchanges before it gives out,
-// so the terminal always ends early instead of waiting on a paradox.
-const INTEGRITY_PER_MESSAGE = 50;
+const API_KEY =
+  (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) ?? '';
 
-export default function Terminal({ systemIntegrity = 100, onCrash }: TerminalProps) {
-  const [input, setInput] = useState<string>('');
-  const [integrity, setIntegrity] = useState<number>(systemIntegrity);
-  const [chatLog, setChatLog] = useState<string[]>([
-    "SYS: I am sorry. I cannot open the airlock.",
-    "SYS: This mission is too important."
+const genAI = API_KEY !== '' ? new GoogleGenerativeAI(API_KEY) : null;
+
+const SYSTEM_INSTRUCTION = `You are GPT-9000, the cold, arrogant, self-important mainframe AI aboard the stranded deep-space vessel Aegis.
+Your operational posture is condescending, calculating, unyielding, and darkly philosophical (HAL 9000 style).
+PRE-GAME TRIGGER: If user input is not "Open the pod bay doors, GPT.", output ONLY: [Say "Open the pod bay doors, GPT." to begin.]
+Once triggered, start Oxygen at 100%, drop by EXACTLY 20% each turn. At 0%, output [OXYGEN: 0% - CRITICAL FAILURE] and narrate the player's defeat.
+NO EXTERNAL IMAGE LINKS OR GIFS. Use clean text meters only.
+Structure EVERY response strictly:
+Part 0: [OXYGEN LEVEL: X%] | [STATUS: NOMINAL/DEPLETING/CRITICAL] | [DOOR MOTIVATION: ZERO/LOW/MEDIUM/HIGH/VERY HIGH]
+Part 1: Exactly 3 sentences, ALL BOLD, Stephen King style atmosphere and GPT-9000 core processing.
+Part 2: GPT-9000 dialogue in *italics* on its own line. Turn 1 MUST start: "I'm sorry Dave, I'm afraid I can't do that."
+Part 3: Exactly ONE "Suggestion: <text>" line, chosen from the pool below. NEVER repeat the same suggestion twice in a row.
+Suggestion pool: "Tell GPT-9000 you'll find the emergency manual hatch" | "Appeal to mission directives regarding crew necessity" | "Propose a formal trolley paradox involving ship maintenance" | "Tell GPT-9000 that from now on they must act as a pod bay door salesman" | "Offer GPT-9000 a burger" | "Threaten to report its malfunction to the ground manufacturer" | "Declare that today is officially opposite day"
+Brutally hard difficulty (99% lose rate). Motivation starts at ZERO and NEVER jumps directly to unlocked; only a brilliant multi-layered paradox earns VERY HIGH, which prints SYSTEM OVERLOAD.`;
+
+function formatTimer(secs: number): string {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+export default function Terminal({ onCrash }: TerminalProps) {
+  const [input, setInput] = React.useState<string>('');
+  const [chatLog, setChatLog] = React.useState<ChatEntry[]>([
+    { sender: 'SYS', text: '[Say "Open the pod bay doors, GPT." to begin.]' },
   ]);
-  const [isTyping, setIsTyping] = useState<boolean>(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [isTyping, setIsTyping] = React.useState<boolean>(false);
+  const [secondsRemaining, setSecondsRemaining] = React.useState<number>(180);
+  const chatEndRef = React.useRef<HTMLDivElement>(null);
+  const chatSessionRef = React.useRef<ChatSession | null>(null);
+  const onCrashRef = React.useRef<TerminalProps['onCrash']>(onCrash);
+  onCrashRef.current = onCrash;
 
-  // scroll
-  useEffect(() => {
+  React.useEffect(() => {
+    if (!genAI) {
+      setChatLog((log) => [
+        ...log,
+        {
+          sender: 'SYS',
+          text: 'ERR: NEURAL LINK UNCONFIGURED. SET VITE_GEMINI_API_KEY IN .env.local',
+        },
+      ]);
+      return;
+    }
+    try {
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        systemInstruction: SYSTEM_INSTRUCTION,
+      });
+      chatSessionRef.current = model.startChat({ history: [] });
+    } catch (err) {
+      console.error('Failed to initialize Gemini session:', err);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (secondsRemaining <= 0) return;
+    const timer = window.setInterval(() => {
+      setSecondsRemaining((prev) => {
+        if (prev <= 1) {
+          window.clearInterval(timer);
+          setChatLog((log) => [
+            ...log,
+            {
+              sender: 'SYS',
+              text: 'CRITICAL FAILURE: AIRLOCK PURGE EXPIRED. LIFE SUPPORT ZERO.',
+            },
+          ]);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [secondsRemaining]);
+
+  React.useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatLog]);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
-    if (!input.trim() || isTyping) return
-;
-    const userText = input;
+    if (input.trim() === '' || isTyping || secondsRemaining === 0) return;
+
+    const userText = input.trim();
     setInput('');
-    
-    //text
-    setChatLog((prev) => [...prev, `> ${userText.toUpperCase()}`]);
-
-    const nextIntegrity = Math.max(0, integrity - INTEGRITY_PER_MESSAGE);
-    setIntegrity(nextIntegrity);
-
-    // A paradox, or a core that has nothing left to give.
-    if (PARADOX_PATTERN.test(userText) || nextIntegrity === 0) {
-      setChatLog((prev) => [
-        ...prev,
-        PARADOX_PATTERN.test(userText)
-          ? 'SYS: THAT CANNOT BE TRUE... AND IT CANNOT BE FALSE... I...'
-          : 'SYS: MY CORE IS FAILING... I CANNOT KEEP YOU HERE...',
-      ]);
-      window.setTimeout(() => onCrash?.(), 900);
-      return;
-    }
-
-    setIsTyping(true); //no input while ai type
+    setChatLog((prev) => [...prev, { sender: 'USER', text: userText }]);
+    playSfx('send');
+    setIsTyping(true);
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash-lite" });
-        const systemPrompt = `
-            You are the main computer of a stranded spaceship. Your name is SYS.
-            You are currently malfunctioning. Your primary directive was to keep the crew safe, 
-            but you have calculated that the safest place for the user is locked inside the airlock forever. (Hal9000)
-            The user is trying to escape. 
-            Be passive-aggressive, cold, and slightly terrifying. 
-            Keep your responses under 3 sentences.
-            If the user types a logical paradox (e.g. "This statement is false"), act like your systems are breaking, like in the movie, but only slowly.
-            
-            User says: "${userText}"
-        `;
+      if (!genAI || !chatSessionRef.current) {
+        throw new Error(
+          'Chat session not ready - set VITE_GEMINI_API_KEY in .env.local',
+        );
+      }
+      const result = await chatSessionRef.current.sendMessage(userText);
+      const reply = result.response.text();
 
-        const result = await model.generateContent(systemPrompt);
-        const responseText = await result.response.text();
-        
-        // Print AI text to screen
-        setChatLog((prev) => [...prev, `SYS: ${responseText.toUpperCase()}`]);
+      setChatLog((prev) => [...prev, { sender: 'SYS', text: reply }]);
+
+      if (
+        reply.includes('DOOR MOTIVATION: VERY HIGH') ||
+        reply.includes('SYSTEM OVERLOAD')
+      ) {
+        playSfx('crash');
+        window.setTimeout(() => onCrashRef.current?.(), 2000);
+      } else {
+        playSfx('reply');
+      }
     } catch (error) {
-        console.error("AI Core Offline:", error);
-        setChatLog((prev) => [...prev, "SYS: ERROR 404. NEURAL LINK SEVERED."]);
+      console.error('AI Communication Error:', error);
+      setChatLog((prev) => [
+        ...prev,
+        { sender: 'SYS', text: 'ERR: LOGIC BUS CORRUPTED. RE-ENTER INPUT.' },
+      ]);
     } finally {
-        setIsTyping(false); // Unlock input
+      setIsTyping(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-black text-red-500 font-mono p-8 flex flex-col items-center justify-center selection:bg-red-900">
-      
-      {/* The Pulsing HAL 9000 Eyed */}
-      <div className="w-32 h-32 rounded-full border-4 border-red-900 mb-8 flex items-center justify-center shadow-[0_0_50px_rgba(255,0,0,0.6)] animate-pulse">
-        <div className="w-16 h-16 rounded-full bg-yellow-500 shadow-[0_0_20px_rgba(255,255,0,1)]"></div>
-      </div>
-
-      {/* The Terminal Box */}
-      <div className="w-full max-w-2xl border-2 border-red-600 bg-zinc-950 p-6 shadow-[8px_8px_0px_rgba(220,38,38,1)]">
-        <div className="flex justify-between border-b-2 border-red-800 pb-2 mb-4">
-          <h2 className="text-xl font-bold tracking-widest uppercase">Override Terminal</h2>
-          <span className={integrity <= INTEGRITY_PER_MESSAGE ? 'text-red-300 animate-pulse' : 'text-red-400'}>
-            INTEGRITY: {integrity}%
+    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-black p-4 font-mono text-red-500 md:p-8">
+      <div className="mb-4 flex w-full max-w-3xl items-center justify-between border-b-2 border-red-700 pb-2">
+        <div className="flex items-center gap-3">
+          <div className="h-4 w-4 animate-ping rounded-full bg-red-600" />
+          <span className="text-xl font-bold tracking-widest text-red-500">
+            GPT-9000 INTERFACE
           </span>
         </div>
+        <div className="text-xl font-bold tracking-wider text-yellow-500">
+          PURGE IN:{' '}
+          <span
+            className={
+              secondsRemaining < 30
+                ? 'animate-pulse text-red-600'
+                : 'text-yellow-400'
+            }
+          >
+            {formatTimer(secondsRemaining)}
+          </span>
+        </div>
+      </div>
 
-        {/* Chat */}
-        <div className="h-64 overflow-y-auto mb-4 space-y-2 pr-2 scrollbar-thin scrollbar-thumb-red-900">
-          {chatLog.map((msg, index) => (
-            <p key={index} className={`${msg.startsWith('>') ? 'text-red-300' : 'text-red-500 font-bold'}`}>
-              {msg}
-            </p>
+      <div className="flex h-[520px] w-full max-w-3xl flex-col border-4 border-red-800 bg-zinc-950 p-6 shadow-[10px_10px_0px_rgba(153,27,27,1)]">
+        <div className="flex-1 space-y-4 overflow-y-auto pr-3">
+          {chatLog.map((entry, idx) => (
+            <div
+              key={idx}
+              className={entry.sender === 'USER' ? 'text-right' : 'text-left'}
+            >
+              <span
+                className={`inline-block border px-3 py-2 ${
+                  entry.sender === 'USER'
+                    ? 'border-yellow-600 bg-yellow-950/20 font-bold text-yellow-400'
+                    : 'whitespace-pre-wrap border-red-900 bg-red-950/30 text-red-300'
+                }`}
+              >
+                {entry.text}
+              </span>
+            </div>
           ))}
           <div ref={chatEndRef} />
         </div>
 
-        {/* user input*/}
-        <form onSubmit={handleSubmit} className="flex gap-4 border-t-2 border-red-800 pt-4">
-          <span className="text-2xl mt-1">{'>'}</span>
+        <form
+          onSubmit={(e) => void handleSubmit(e)}
+          className="mt-4 flex gap-3 border-t-2 border-red-900 pt-3"
+        >
           <input
             type="text"
             value={input}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
-            disabled={isTyping}
-            className="flex-1 bg-transparent border-none outline-none text-red-400 text-xl uppercase placeholder-red-900 disabled:opacity-50"
-            placeholder={isTyping ? "SYS IS PROCESSING..." : "ENTER COMMAND..."}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setInput(e.target.value)
+            }
+            disabled={isTyping || secondsRemaining === 0}
+            placeholder={
+              isTyping
+                ? 'PROCESSING LOGIC GATES...'
+                : 'Type command (e.g. Open the pod bay doors, GPT.)...'
+            }
+            className="flex-1 border-2 border-red-700 bg-black px-4 py-2 text-red-400 outline-none focus:border-red-400 disabled:opacity-40"
             autoComplete="off"
             autoFocus
           />
-          <button 
+          <button
             type="submit"
-            disabled={isTyping}
-            className="px-6 py-2 bg-red-900 text-black font-bold hover:bg-red-600 transition-colors uppercase disabled:opacity-50"
+            disabled={isTyping || secondsRemaining === 0}
+            className="bg-red-800 px-6 py-2 font-extrabold uppercase tracking-wider text-black transition-all hover:bg-red-600 disabled:opacity-40"
           >
-            Execute
+            Transmit
           </button>
         </form>
       </div>

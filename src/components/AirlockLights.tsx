@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { playSfx } from '~/lib/sfx';
 
 /**
  * The airlock has no power: the player wakes in pitch darkness and has to find
@@ -35,6 +36,7 @@ export default function AirlockLights({
   const turnOnLights = React.useCallback(() => {
     setLightsOn((prev) => {
       if (prev) return prev;
+      playSfx('lights');
       onLightsOn?.();
       return true;
     });

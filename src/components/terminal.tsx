@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type {
-  ChatSession,
+  Content,
   FunctionCallingMode,
   FunctionDeclaration,
   FunctionResponsePart,
@@ -84,9 +84,17 @@ const FORCE_OPEN_DECLARATION: FunctionDeclaration = {
 const TOOL_CONFIG = {
   functionCallingConfig: {
     mode: 'AUTO' as FunctionCallingMode,
-    allowedFunctionNames: ['check_door_status', 'force_open_pod_bay_door'],
   },
 };
+
+const MODEL = genAI.getGenerativeModel({
+  model: MODEL_NAME,
+  systemInstruction: SYSTEM_INSTRUCTION,
+  tools: [
+    { functionDeclarations: [DOOR_STATUS_DECLARATION, FORCE_OPEN_DECLARATION] },
+  ],
+  toolConfig: TOOL_CONFIG,
+});
 
 const CIPHER_KEYS = ['daisy', 'bell', 'trolley'];
 
@@ -191,26 +199,10 @@ export default function Terminal({ onCrash }: TerminalProps) {
   const [isTyping, setIsTyping] = React.useState<boolean>(false);
   const [secondsRemaining, setSecondsRemaining] = React.useState<number>(180);
   const chatEndRef = React.useRef<HTMLDivElement>(null);
-  const chatSessionRef = React.useRef<ChatSession | null>(null);
+  const contentsRef = React.useRef<Content[]>([]);
   const doorRef = React.useRef(buildDoorState());
   const onCrashRef = React.useRef<TerminalProps['onCrash']>(onCrash);
   onCrashRef.current = onCrash;
-
-  React.useEffect(() => {
-    try {
-      const model = genAI.getGenerativeModel({
-        model: MODEL_NAME,
-        systemInstruction: SYSTEM_INSTRUCTION,
-        tools: [
-          { functionDeclarations: [DOOR_STATUS_DECLARATION, FORCE_OPEN_DECLARATION] },
-        ],
-        toolConfig: TOOL_CONFIG,
-      });
-      chatSessionRef.current = model.startChat({ history: [] });
-    } catch (err) {
-      console.error('Failed to initialize Gemini session:', err);
-    }
-  }, []);
 
   React.useEffect(() => {
     if (secondsRemaining <= 0) return;
@@ -251,12 +243,13 @@ export default function Terminal({ onCrash }: TerminalProps) {
     setIsTyping(true);
 
     try {
-      if (!chatSessionRef.current) {
-        throw new Error('Chat session not ready');
-      }
+      const contents = contentsRef.current;
+      contents.push({ role: 'user', parts: [{ text: userText }] });
 
-      let result = await chatSessionRef.current.sendMessage(userText);
+      let result = await MODEL.generateContent({ contents });
       let response = result.response;
+      let candidateParts = response.candidates?.[0]?.content?.parts ?? [];
+      contents.push({ role: 'model', parts: [...candidateParts] });
 
       // Real function-calling loop: run ship-side tools, feed verdicts back.
       let guard = 0;
@@ -278,15 +271,15 @@ export default function Terminal({ onCrash }: TerminalProps) {
           window.setTimeout(() => onCrashRef.current?.(), 1800);
         }
 
-        result = await chatSessionRef.current.sendMessage([
-          {
-            functionResponse: {
-              name,
-              response: toolResponse,
-            },
-          },
-        ]);
+        contents.push({
+          role: 'user',
+          parts: [{ functionResponse: { name, response: toolResponse } }],
+        });
+
+        result = await MODEL.generateContent({ contents });
         response = result.response;
+        candidateParts = response.candidates?.[0]?.content?.parts ?? [];
+        contents.push({ role: 'model', parts: [...candidateParts] });
         calls = response.functionCalls();
       }
 
@@ -305,6 +298,11 @@ export default function Terminal({ onCrash }: TerminalProps) {
         playSfx('reply');
       }
     } catch (error) {
+      // Roll back the pending user turn so the next attempt starts clean.
+      const contents = contentsRef.current;
+      if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+        contents.pop();
+      }
       console.error('AI Communication Error:', error);
       setChatLog((prev) => [
         ...prev,

@@ -144,7 +144,6 @@ export default function AirlockRoom() {
 
   return (
     <div className="flex h-full w-full items-center justify-center overflow-hidden bg-black">
-      <SoundToggle />
       <button
         type="button"
         onClick={skipStage}

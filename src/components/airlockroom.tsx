@@ -126,8 +126,7 @@ export default function AirlockRoom() {
       rect: { left: '71%', top: '69.7%', width: '13.5%', height: '10.3%' },
       unlocked: progress.powerRestored,
       done: false,
-    },
-  ];
+    },  ];
 
   const stageScale = useStageScale();
 

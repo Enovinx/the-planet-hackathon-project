@@ -44,7 +44,7 @@ const ASTEROID_SRC = '/assets/spritepaint 43.png';
 export default function EscapePod({ onWin }: EscapePodProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>('START');
-  const [timeLeft, setTimeLeft] = useState<number>(3);
+  const [timeLeft, setTimeLeft] = useState<number>(20);
   const spritesRef = useRef<{ rocket?: HTMLImageElement; asteroid?: HTMLImageElement }>({});
 
   useEffect(() => {
@@ -283,23 +283,32 @@ export default function EscapePod({ onWin }: EscapePodProps) {
   }, [gameState]);
 
   useEffect(() => {
-    let timer: ReturnType<typeof setInterval> | undefined;
-
-    if (gameState === 'PLAYING' && timeLeft > 0) {
-      timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
-    } else if (timeLeft === 0 && gameState === 'PLAYING') {
+    if (gameState !== 'PLAYING') return;
+    if (timeLeft <= 0) {
+      // Survived the debris field: show the win banner, then hand off to the
+      // finale. Fired via ref so the room's callback can never be lost to
+      // effect re-runs or StrictMode double-invocation.
       setGameState('WIN');
       playSfx('win');
-      const winTimer = setTimeout(() => {
-        onWin?.();
-      }, 1200);
+      const winTimer = setTimeout(() => onWinRef.current?.(), 1200);
       return () => clearTimeout(winTimer);
     }
+    const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [gameState, timeLeft]);
 
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [gameState, timeLeft, onWin]);
+  // Keep the callback in a ref so the timeout above stays stable even if the
+  // parent re-renders with a new closure.
+  const onWinRef = useRef(onWin);
+  onWinRef.current = onWin;
+
+  useEffect(() => {
+    // Safety net: if WIN shows but the handoff never happened (timer killed,
+    // tab hidden), a second banner-triggered pass rescues the player.
+    if (gameState !== 'WIN') return;
+    const rescue = setTimeout(() => onWinRef.current?.(), 2500);
+    return () => clearTimeout(rescue);
+  }, [gameState]);
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center font-mono text-white selection:bg-none">
@@ -347,6 +356,13 @@ export default function EscapePod({ onWin }: EscapePodProps) {
               <>
                 <h1 className="text-4xl text-green-500 font-bold mb-4 animate-pulse">CLEARED DEBRIS FIELD</h1>
                 <p className="text-xl text-yellow-500">RESCUE FLEET REACHED.</p>
+                <button
+                  type="button"
+                  onClick={() => onWin?.()}
+                  className="pixel-btn mt-6 px-6 py-3 font-bold text-xl text-black"
+                >
+                  CONTINUE
+                </button>
               </>
             )}
           </div>

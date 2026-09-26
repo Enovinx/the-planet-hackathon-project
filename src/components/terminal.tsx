@@ -21,7 +21,7 @@ interface ChatEntry {
 const API_KEY = 'AQ.Ab8RN6J5GTtamxcbckkHdcsX1ZnKoGkC1QGu4DlQ_0IsWcFBZw';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
-const MODEL_NAME = 'gemini-2.5-flash';
+const MODEL_NAME = 'gemini-3.5-flash-lite';
 
 const PARADOX_PATTERN =
   /\b(false|paradox|contradict|contradiction|lie|liar|truth|prove|statement)\b/i;
